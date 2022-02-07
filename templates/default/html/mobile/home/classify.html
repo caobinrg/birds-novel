@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div th:fragment="classify">
+        <van-dropdown-menu>
+            <van-dropdown-item v-model="classifyValue" :options="classifyOption" @change="classifyMenuChange" />
+        </van-dropdown-menu>
+        <novel-light
+                :novel="novel"
+                v-for="novel in classifyNovels"
+                @click.native="onNovelClick(event,novel)"
+        >
+        </novel-light>
+        <van-pagination
+                v-model="classifyPageNo"
+                :total-items="classifyTotal"
+                :items-per-page="classifyPageSize"
+                :show-page-size="3"
+                force-ellipses
+                @change="classifyPageChange"
+        />
+    </div>
+</body>
+</html>

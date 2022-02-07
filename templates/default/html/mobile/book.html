@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    ${novel.name + '_'  + webSiteName},
+    ${novel.keywords},
+    ${novel.description})">
+        <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
+    </head>
+
+</head>
+<body>
+<div id="app">
+    <van-nav-bar :title="novel.name" left-text="返回" left-arrow @click-left="onClickLeft">
+    </van-nav-bar>
+    <van-skeleton title avatar :row="3" :loading="false">
+        <div class="book_content">
+            <div class="head">
+                <div class="left">
+                    <h3>{{novel.name}}</h3>
+                    <p> {{novel.author}}</p>
+                    <p class="info"> {{novel.novelType}}·{{novel.updateStatus}}·{{novel.wordNum}}万字</p>
+                </div>
+                <div class="right">
+                    <img :src="novel.image">
+                </div>
+            </div>
+        </div>
+    </van-skeleton>
+
+    <van-grid :column-num="2">
+        <van-grid-item icon="like-o" :text="'评分 ' + novel.score"></van-grid-item>
+        <van-grid-item icon="star-o" :text="'收藏 ' + novel.scorePersonNum" ></van-grid-item>
+    </van-grid>
+
+    <van-tabs v-model="active" animated>
+        <van-tab title="简介" :style="{height:'280px'}">
+            <van-field
+                    v-model="novel.intro"
+                    type="textarea"
+                    autosize
+                    readonly />
+        </van-tab>
+        <van-tab title="目录" :style="{height:'280px'}">
+            <van-cell :title="chapter.chapterName" v-for="chapter in novel.chapterList" is-link :url="chapter.chapterUrl" ></van-cell>
+            <van-cell icon="orders-o" title="查看完整章节目录" is-link @click="clickAllChapter"></van-cell>
+        </van-tab>
+    </van-tabs>
+
+    <van-popup v-model:show="show" position="left" :close-on-popstate="true" :style="{ width: '75%' ,height: '100%' }">
+        <van-cell-group v-for="chapter in allChapter">
+            <van-cell :title="chapter.chapterName" is-link :url="chapter.chapterUrl"/>
+        </van-cell-group>
+    </van-popup>
+
+    <van-tabbar active-color="#7d7e80" inactive-color="#7d7e80">
+        <van-tabbar-item  icon="home-o" replace @click="clickHome">返回首页</van-tabbar-item>
+        <van-tabbar-item v-if="isFirst"  icon="play-circle-o"  :url="chapterUrl">开始阅读</van-tabbar-item>
+        <van-tabbar-item v-else icon="play-circle-o" :url="chapterUrl">继续阅读</van-tabbar-item>
+        <van-tabbar-item>
+           <div style="font-size: 12px;line-height: 1;cursor: pointer;color: rgb(125, 126, 128);">加入书架</div>
+            <template #icon>
+                <van-icon v-if="starValue" name="star" size="22" color="#ffd21e" @click="starClick()"></van-icon>
+                <van-icon v-else name="star-o" size="22" @click="starClick()"></van-icon>
+            </template>
+        </van-tabbar-item>
+    </van-tabbar>
+
+
+    <van-popup v-model:show="userLoginShow" position="bottom" :close-on-popstate="true" :closeable="true"
+               :style="{ width: '100%' ,height: '100%', 'background-color':'#f7f8fa' }">
+        <van-nav-bar title="登录"></van-nav-bar>
+        <van-form style="margin: 40px 15px 0 15px">
+            <van-field
+                    v-model="username"
+                    name="账号"
+                    label="账号"
+                    placeholder="账号"
+                    :rules="[{ required: true, message: '请填写账号' }]"
+            ></van-field>
+            <van-field
+                    v-model="password"
+                    :type="isPassword"
+                    name="密码"
+                    label="密码"
+                    placeholder="密码"
+                    :rules="[{ required: true, message: '请填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
+            >
+                <template #right-icon>
+                    <van-icon name="eye-o" @click="isPasswordChange"/>
+                </template>
+            </van-field>
+            <van-field
+                    v-if="isRegister"
+                    v-model="confirmPassword"
+                    :type="isPassword"
+                    name="密码确认"
+                    label="密码确认"
+                    placeholder="密码确认"
+                    :rules="[{ required: true, message: '请再次填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
+            >
+                <template #right-icon>
+                    <van-icon name="eye-o" @click="isPasswordChange"/>
+                </template>
+            </van-field>
+            <div>
+                <div style="margin: 16px;">
+                    <van-button round block type="primary" native-type="submit" @click="onSubmit">
+                        {{subButtonText}}
+                    </van-button>
+                </div>
+                <div style="text-align:center;" >
+                    <div @click="toRegister">没有账号？立即注册</div>
+                </div>
+            </div>
+
+        </van-form>
+    </van-popup>
+</div>
+</body>
+<script th:inline="javascript">
+    const app = Vue.createApp({
+        data:()=>({
+            active:0,
+            show: false,
+            userLoginShow:false,
+            starValue: [[ ${isStar} ]],
+            novel: [[${novel}]],
+            chapterId:[[${chapterId}]],
+            isFirst:[[${isFirst}]],
+            allChapter: [],
+            chapterUrl: [[${chapterUrl}]],
+            username:"",
+            password:"",
+            confirmPassword:"",
+            isPassword:"password",
+            isRegister:false,
+            subButtonText:"登录",
+            isRegisterText:"没有账号？立即注册"
+        }),
+        created:function(){
+            var self = this;
+            $.ajax({
+                url: '/api/novel/getChapter',
+                type: 'post',
+                data: JSON.stringify({"novelId": [[${novel.novelId}]]}),
+                contentType: 'application/json',
+            }).then(function (res) {
+                if(res!=undefined && res.success == true){
+                    self.allChapter =  res.data
+                }
+                // vant.Toast.clear();
+            }).fail(function () {
+                // vant.Toast.clear();
+            });
+        },
+        methods:{
+            clickAllChapter(){
+                this.show = true;
+            },
+            onClickLeft(){
+                history.back(-1);
+            },
+            clickHome(){
+                window.location.replace("/");
+            },
+            starClick(){
+                if(!this.starValue){
+                    //收藏
+                    var self = this;
+                    $.ajax({
+                        url: '/api/user/bookStar',
+                        type: 'post',
+                        data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }).then(function (res) {
+                        if(res==undefined){
+                            vant.Toast("出错了")
+                            return
+                        }
+                        if(res.success != true && res.errorCode == 10001){
+                            self.userLoginShow = true;
+                            return
+                        }
+                        if(res.success != true){
+                            vant.Toast(res.msg)
+                            return;
+                        }
+                        self.starValue = true;
+                        vant.Toast("收藏成功")
+                    }).fail(function () {
+                        vant.Toast("出错了")
+                    });
+                }else{
+                    //取消收藏
+                    var self = this;
+                    $.ajax({
+                        url: '/api/user/unBookStar',
+                        type: 'post',
+                        data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }).then(function (res) {
+                        if(res==undefined){
+                            vant.Toast("出错了")
+                            return
+                        }
+                        if(res.success != true && res.errorCode == 10001){
+                            self.userLoginShow = true;
+
+                            return
+                        }
+                        if(res.success != true){
+                            vant.Toast(res.msg)
+                            return;
+                        }
+                        self.starValue = false;
+                        vant.Toast("取消收藏成功")
+                    }).fail(function () {
+                        vant.Toast("出错了")
+                    });
+                }
+
+            },
+            isPasswordChange:function () {
+                if(this.isPassword == "password"){
+                    this.isPassword = "text"
+                }else{
+                    this.isPassword = "password"
+                }
+            },
+            toRegister:function () {
+                if(!this.isRegister){
+                    this.isRegister = true
+                    this.subButtonText = "注册"
+                    this.isRegisterText = "已有账号？请登录"
+                }else{
+                    this.isRegister = false
+                    this.subButtonText = "登录"
+                    this.isRegisterText = "没有账号？立即注册"
+                }
+            },
+            onSubmit:function () {
+               if(this.isRegister){
+                   //注册
+                   if(this.password == "" || this.confirmPassword == "" || this.password != this.confirmPassword ){
+                       vant.Toast("请确认两次密码输入是否一致")
+                   }
+                   var self = this;
+                   $.ajax({
+                       url: '/api/user/register',
+                       type: 'post',
+                       data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
+                       dataType: 'json',
+                       contentType: 'application/json',
+                   }).then(function (res) {
+                        if(res!=undefined && res.success == true){
+                            vant.Toast("注册成功")
+                            self.userLoginShow = false;
+                        }else{
+                            vant.Toast(res.msg ? res.msg : "注册失败")
+                        }
+                   }).fail(function () {
+                       vant.Toast("注册失败！")
+                   });
+               }else{
+                   var self = this;
+                   $.ajax({
+                       url: '/api/user/login',
+                       type: 'post',
+                       data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
+                       dataType: 'json',
+                       contentType: 'application/json',
+                       async:false,
+                   }).then(function (res) {
+                       if(res!=undefined && res.success == true){
+                           vant.Toast("登录成功")
+                           self.userLoginShow = false;
+                       }else{
+                           vant.Toast(res.msg ? res.msg : "登录失败")
+                       }
+                   }).fail(function () {
+                       vant.Toast("登录失败！")
+                   });
+               }
+            }
+        }
+    }).use(vant).mount("#app")
+</script>
+</html>

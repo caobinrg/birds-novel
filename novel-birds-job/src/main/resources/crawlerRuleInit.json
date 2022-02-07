@@ -1,0 +1,341 @@
+[
+  {
+  "ruleId":"3dccc9aa30004cb999466fb78aef4e7a",
+  "ruleName": "xbiquge1",
+  "contentRule": {
+    "contentOutLabelRule": [
+      "p"
+    ],
+    "contentTextRule": "//div[@id=\"content\"]/html()",
+    "nameRule": "//h1/text()",
+    "type": 3
+  },
+  "detailRule": {
+    "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+    "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+    "chapterListSkipNoRule": 0,
+    "chapterNameRule": "//a/text()",
+    "chapterUrlRule": "//a/@href",
+    "imageRule": "//meta[@property=\"og:image\"]/@content",
+    "imageSave": true,
+    "introRule": "//meta[@property=\"og:description\"]/@content",
+    "introReplaceRule": ["笔趣阁"],
+    "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+    "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+    "nameRule": "//meta[@property=\"og:title\"]/@content",
+    "scorePersonNumRule": "",
+    "scoreRule": "",
+    "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+    "keywordsReplaceRule": [],
+    "descriptionRule": "//meta[@name=\"description\"]/@content",
+    "descriptionReplaceRule": ["新笔趣阁"],
+    "type": 2,
+    "updateStatusRule": "",
+    "wordNumRule": ""
+  },
+  "initStatus": 0,
+  "initAfterInterval": 10,
+  "listRule": {
+    "afterInitPageNo": 3,
+    "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+    "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+    "pageEndRule": 755,
+    "pageStartRule": 1,
+    "sourceUrl": "https://www.xbiquge.la/fenlei/1_[pageNo].html",
+    "type": 1
+  },
+  "openStatus": 1
+},
+
+
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7b",
+    "ruleName": "xbiquge2",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 275,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/2_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  },
+
+
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7c",
+    "ruleName": "xbiquge3",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 623,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/3_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  },
+
+
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7d",
+    "ruleName": "xbiquge4",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 222,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/4_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  },
+
+
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7f",
+    "ruleName": "xbiquge5",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 231,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/5_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  },
+
+
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7g",
+    "ruleName": "xbiquge6",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 303,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/6_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  },
+  {
+    "ruleId":"3dccc9aa30004cb999466fb78aef4e7h",
+    "ruleName": "xbiquge7",
+    "contentRule": {
+      "contentOutLabelRule": [
+        "p"
+      ],
+      "contentTextRule": "//div[@id=\"content\"]/html()",
+      "nameRule": "//h1/text()",
+      "type": 3
+    },
+    "detailRule": {
+      "authorRule": "//meta[@property=\"og:novel:author\"]/@content",
+      "chapterListRule": "//div[@class=\"box_con\"]/div/dl/dd",
+      "chapterListSkipNoRule": 0,
+      "chapterNameRule": "//a/text()",
+      "chapterUrlRule": "//a/@href",
+      "imageRule": "//meta[@property=\"og:image\"]/@content",
+      "imageSave": true,
+      "introRule": "//meta[@property=\"og:description\"]/@content",
+      "introReplaceRule": ["笔趣阁"],
+      "lastUpdateMarkRule": "//div[@id=\"info\"]/p[3]/text()",
+      "novelTypeRule": "//meta[@property=\"og:novel:category\"]/@content",
+      "nameRule": "//meta[@property=\"og:title\"]/@content",
+      "scorePersonNumRule": "",
+      "scoreRule": "",
+      "keywordsRule": "//meta[@name=\"keywords\"]/@content",
+      "keywordsReplaceRule": [],
+      "descriptionRule": "//meta[@name=\"description\"]/@content",
+      "descriptionReplaceRule": ["新笔趣阁"],
+      "type": 2,
+      "updateStatusRule": "",
+      "wordNumRule": ""
+    },
+    "initStatus": 0,
+    "initAfterInterval": 10,
+    "listRule": {
+      "afterInitPageNo": 3,
+      "getUrlListRule": "//div[@class=\"l\"]/ul/li",
+      "getUrlRule": "//span[@class=\"s2\"]/a/@href",
+      "pageEndRule": 750,
+      "pageStartRule": 1,
+      "sourceUrl": "https://www.xbiquge.la/fenlei/7_[pageNo].html",
+      "type": 1
+    },
+    "openStatus": 1
+  }
+]

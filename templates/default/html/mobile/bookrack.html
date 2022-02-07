@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书架_' + webSiteName},
+    keywords=${'书架,' + webSiteKeywords},
+    description=${'书架,'+webSiteDescription})">
+    </head>
+    <style>
+        .delete-button {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+<van-pull-refresh v-model="loading" @refresh="onRefresh">
+    <div>
+<!--        <van-nav-bar title="书架" />-->
+    </div>
+    <div v-if="rackNovels.length > 0" >
+        <van-cell title="书架" icon="star-o" :is-link="false" :clickable="false" >
+        </van-cell>
+        <van-swipe-cell v-if="rackNovels !== undefined && rackNovels.length >0" v-for="(item,index) in rackNovels">
+            <novel-light
+                    :novel="item"
+                    @click.native="onNovelClick(event,item)"
+            >
+            </novel-light>
+            <template #right>
+                <van-button square text="删除" type="danger" class="delete-button" @click="unStar(index,item)" />
+            </template>
+        </van-swipe-cell>
+<!--        <van-empty v-if="rackNovels == undefined || rackNovels.length <1" description="书架为空" />-->
+    </div>
+    <div>
+        <van-cell title="阅读历史" icon="orders-o" :is-link="false" :clickable="false" >
+        </van-cell>
+<!--        <van-swipe-cell v-if="hisNovels !== undefined && hisNovels.length >0" v-for="item in hisNovels">-->
+            <novel-light
+                    v-for="item in hisNovels"
+                    :novel="item"
+                    @click.native="onNovelClick(event,item)"
+            >
+            </novel-light>
+<!--            <template #right>-->
+<!--                <van-button square text="删除" type="danger" class="delete-button" />-->
+<!--            </template>-->
+<!--        </van-swipe-cell>-->
+        <van-empty v-if="hisNovels == undefined || hisNovels.length <1" description="阅读历史为空" />
+    </div>
+    <van-divider dashed>到底了</van-divider>
+    <div th:replace="mobile/common/footer::tabbar"></div>
+</van-pull-refresh>
+</div>
+
+<div th:replace="mobile/common/footer::copyright"></div>
+<script th:src="@{/static/mobile/js/novel-light.js}"></script>
+<script th:inline="javascript">
+    // 在 #app 标签下渲染一个按钮组件
+    const app = Vue.createApp({
+        components: {
+            'novel-light': novel_light,
+        },
+        data: () => ({
+            active: 1,
+            hisNovels:[[${novelHis}]] ,
+            rackNovels: [[${rackNovels}]],
+            loading: false
+        }),
+        methods: {
+            onRefresh(){
+                var self = this;
+                $.ajax({
+                    url: '/api/user/getBookStar',
+                    type: 'post',
+                    data: {},
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res != undefined && res.success == true){
+                        self.rackNovels = res.data
+                    }
+                }).fail(function (error) {
+                    vant.Toast("出错了")
+                });
+                $.ajax({
+                    url: '/api/user/getBookHis',
+                    type: 'post',
+                    data: {},
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res != undefined && res.success == true){
+                        self.hisNovels = res.data
+                    }
+                }).fail(function (error) {
+                    vant.Toast("出错了")
+                });
+                this.loading = false;
+            },
+            onNovelClick(index,item){
+                window.location = item.novelUrl;
+            },
+            unStar(index,item){
+                vant.Dialog.confirm({
+                    title: '取消确认',
+                    message:
+                        '是否确认取消收藏',
+                }).then(() => {
+                    var self = this
+                    $.ajax({
+                        url: '/api/user/unBookStar',
+                        type: 'post',
+                        data: JSON.stringify({"novelId": item.novelId}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }).then(function (res) {
+                        if(res==undefined){
+                            vant.Toast("出错了")
+                            return
+                        }
+                        if(res.success != true){
+                            vant.Toast(res.msg)
+                            return;
+                        }
+                        vant.Toast("取消收藏成功")
+                        self.rackNovels.splice(index,1)
+                        return;
+                    }).fail(function (error) {
+                        console.log(error)
+                        vant.Toast("出错了")
+                    });
+
+                }).catch(() => {
+
+                });
+            }
+        }
+    }).use(vant).mount("#app");
+</script>
+</body>
+
+
+</html>

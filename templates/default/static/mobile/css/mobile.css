@@ -1,0 +1,37 @@
+/*home*/
+.notice-swipe {
+    height: 40px;
+    line-height: 40px;
+}
+.replay {
+    font-size: 16px;
+    line-height: inherit;
+}
+
+/*book*/
+.head {
+    display: flex;
+    justify-content: space-between;
+    background-color: #81868c;
+    color: #FFFFFF;
+    padding: 4px 8px;
+}
+.head .left h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+.head .left p {
+    font-size: 15px;
+    color: #D4D0D0;
+}
+.head .left .info {
+    margin-top: 43px;
+    margin-bottom: 1px;
+}
+.head .right img {
+    margin-top: 5px;
+    width: 105px;
+    height: 145px;
+    border-radius: 5px;
+}

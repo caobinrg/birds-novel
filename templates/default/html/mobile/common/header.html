@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="common_header(title,keywords,description)">
+    <meta charset="utf-8">
+    <title th:text="${title}">common header</title>
+    <meta name="keywords" th:attr="content=${keywords}">
+    <meta name="description" th:attr="content=${description}">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- 引入样式文件 -->
+    <link
+            rel="stylesheet"
+            th:href="@{/static/mobile/css/vant/index.min.css}"
+    />
+<!--    <link-->
+<!--            rel="stylesheet"-->
+<!--            href="https://cdn.jsdelivr.net/npm/vant@next/lib/index.css"-->
+<!--    />-->
+    <link rel="stylesheet"  th:href="@{/static/mobile/css/mobile.css}" />
+    <!-- 引入 Vue 和 Vant 的 JS 文件 -->
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue@next"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/vant@next/lib/vant.min.js"></script>-->
+    <script th:src="@{/static/common/js/vue.global.prod.js}"></script>
+    <script th:src="@{/static/mobile/js/vant/vant.min.js}"></script>
+    <script th:src="@{/static/common/js/jquery-3.6.0.min.js}"></script>
+</head>
+<body>
+
+</body>
+</html>

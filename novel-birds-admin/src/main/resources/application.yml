@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: novel-birds-admin
+  profiles:
+    active: dev
+  resources:
+    static-locations: classpath:/static/
+  thymeleaf:
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+    check-template-location: true
+    prefix: classpath:/templates/
+server:
+  port: 20101
+
+custom:
+  login-url: /login

@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    include: service-prod
+
+spider:
+  # 0:cpu*2 线程数启动
+  threadNum: 3
+  retryTimes: 3000
+  sleepTime: 3000
+  timeOut: 60000

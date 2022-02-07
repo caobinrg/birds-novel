@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>数据表格</title>
+		<link rel="stylesheet" href="../../component/pear/css/pear.css" th:href="@{/component/pear/css/pear.css}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+						<label class="layui-form-label">推荐类型</label>
+						<div class="layui-input-inline">
+							<select name="setType">
+								<option value=""></option>
+								<option value="站长推荐">站长推荐</option>
+								<option value="书荒推荐">书荒推荐</option>
+							</select>
+						</div>
+						<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="novel-query">
+							<i class="layui-icon layui-icon-search"></i>
+							查询
+						</button>
+						<button type="reset" class="pear-btn pear-btn-md">
+							<i class="layui-icon layui-icon-refresh"></i>
+							重置
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="novel-table" lay-filter="novel-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="novel-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+				<i class="layui-icon layui-icon-add-1"></i>
+				新增
+			</button>
+		</script>
+
+		<script type="text/html" id="novel-bar">
+			<button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i
+					class="layui-icon layui-icon-delete"></i></button>
+		</script>
+
+		<script type="text/html" id="novel-image">
+			<img src="{{d.image}}">
+		</script>
+
+		<div style="display: none">
+			<div class="layer-right" style="margin-right: 2.5em;margin-top: 2em">
+				<form class="layui-form" action=""  onsubmit="return false">
+					<div class="layui-form-item">
+						<label class="layui-form-label">小说名称</label>
+						<div class="layui-input-block">
+							<select name="novelId" class="novelSelect" lay-filter="novelSelect" lay-verify="required" lay-search>
+								<option value=""></option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">推荐类型</label>
+						<div class="layui-input-block">
+							<select name="setType" lay-verify="required">
+								<option value="站长推荐">站长推荐</option>
+								<option value="书荒推荐">书荒推荐</option>
+							</select>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="novelSelectSubmit">增加</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script src="../../component/layui/layui.js" th:src="@{/component/layui/layui.js}"></script>
+		<script src="../../component/pear/pear.js" th:src="@{/component/pear/pear.js}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery', 'drawer', 'dropdown'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let drawer = layui.drawer;
+				let MODULE_PATH = "/recommend/";
+				let cols = [
+					[
+						{
+							title: '小说名称',
+							field: 'name',
+							align: 'center',
+						},
+						{
+							title: '小说作者',
+							field: 'author',
+							align: 'center'
+						},
+						{
+							title: '封面',
+							field: 'image',
+							align: 'center',
+							templet: '#novel-image'
+						},
+						{
+							title: '字数(万字)',
+							field: 'wordNum',
+							align: 'center',
+						},
+						{
+							title: '小说状态',
+							field: 'updateStatus',
+							align: 'center'
+						},
+						{
+							title: '小说类型',
+							field: 'novelType',
+							align: 'center',
+						},
+						{
+							title: '推荐类型',
+							field: 'setType',
+							align: 'center',
+						},
+						{
+							title: '操作',
+							toolbar: '#novel-bar',
+							align: 'center',
+							width: 160,
+							fixed: 'right'
+						}
+					]
+				]
+
+				table.render({
+					elem: '#novel-table',
+					url: '/recommend/getByType',
+					method: 'post',
+					contentType: 'application/json',
+					request: {
+						pageName: 'pageNo' //页码的参数名称，默认：page
+						,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+					},
+					parseData: function(res){ //res 即为原始返回的数据
+						return {
+							"code": res.success, //解析接口状态
+							"msg": res.msg, //解析提示文本
+							"count": res.data.total, //解析数据长度
+							"data": res.data.data //解析数据列表
+						}
+					},
+					response: {
+						statusCode: true //规定成功的状态码，默认：0
+					},
+					page: true,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#novel-toolbar',
+					defaultToolbar: []
+				});
+
+				table.on('tool(novel-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					}
+				});
+
+				table.on('toolbar(novel-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					}
+				});
+
+				form.on('submit(novel-query)', function(data) {
+					table.reload('novel-table', {
+						where: data.field
+					})
+					return false;
+				});
+
+				form.on('submit(novelSelectSubmit)',function (data) {
+					$.ajax({
+						url: MODULE_PATH + "set",
+						dataType: 'json',
+						contentType: "application/json;charset=UTF-8",
+						type: 'post',
+						data: JSON.stringify(data.field),
+						success: function (result) {
+							if(result.success){
+								table.reload('novel-table');
+							}
+						}
+					})
+				})
+				window.novelSelectListen = function(){
+					$(".novelSelect").next().find("input").bind('input',function(e){
+					}).on('compositionend', function (e) {
+						let novelName = e.delegateTarget.value;
+						console.log(novelName)
+						$.ajax({
+							url:MODULE_PATH + "getNovelByName",
+							dataType: 'json',
+							contentType: "application/json;charset=UTF-8",
+							type: 'post',
+							data : JSON.stringify({"pageNo":1,"pageSize":5,"novelName":novelName}),
+							success:function (result) {
+								$('.novelSelect').next().find('dl').empty()
+								$('.novelSelect').empty()
+								$('.novelSelect').next().find('dl')
+										.append(`<dd lay-value="" class="layui-select-tips layui-this">请选择</dd>`);
+								$('.novelSelect').append(new Option("请选择",""))
+								if(result.success){
+									$.each(result.data.data, function(index, item) {
+										$('.novelSelect')
+												.append(new Option(item.name,item.novelId));
+										$('.novelSelect').next().find('dl')
+												.append(`<dd lay-value=${item.novelId} class=""
+												onclick="novelSelectClick('${item.novelId}')">${item.name}</dd>`);
+									});
+								}
+							}
+						})
+
+					});
+				}
+
+				window.novelSelectClick = function(novelId){
+					$('.novelSelect').find("option[value="+novelId+"]").attr("selected",true);
+					form.render('select')
+					novelSelectListen()
+				}
+				window.add = function() {
+					drawer.open({
+						direction: "right",
+						dom: ".layer-right",
+						distance: "40%"
+					});
+
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该推荐', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "remove",
+							dataType: 'json',
+							contentType: "application/json;charset=UTF-8",
+							type: 'post',
+							data : JSON.stringify({"setType":obj.data.setType,"novelId":obj.data.novelId}),
+							success: function(result) {
+								layer.close(loading);
+								if (result.success) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+				window.novelSelectListen();
+			})
+		</script>
+	</body>
+</html>

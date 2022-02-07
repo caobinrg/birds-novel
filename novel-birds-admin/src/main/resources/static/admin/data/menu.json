@@ -1,0 +1,74 @@
+[{
+		"id": 1,
+		"title": "工作空间",
+		"icon": "layui-icon layui-icon-console",
+		"type": 0,
+		"href": "",
+		"children": [{
+			"id": 10,
+			"title": "数据统计",
+			"icon": "layui-icon layui-icon-console",
+			"type": 1,
+			"openType": "_iframe",
+			"href": "/console"
+		}]
+	},
+	{
+		"id": "bookManage",
+		"title": "书籍管理",
+		"icon": "layui-icon layui-icon-console",
+		"type": 0,
+		"href": "/recommend/recommend",
+		"children": [
+			{
+			"id": "recommend",
+			"title": "推荐设置",
+			"icon": "layui-icon layui-icon-face-smile",
+			"type": 1,
+			"openType": "_iframe",
+			"href": "/recommend/view"
+			},
+			{
+				"id": "bookQuery",
+				"title": "书籍查询",
+				"icon": "layui-icon layui-icon-face-smile",
+				"type": 1,
+				"openType": "_iframe",
+				"href": "/book/queryView"
+			}
+		]
+	},
+	{
+		"id": "rule",
+		"title": "采集管理",
+		"icon": "layui-icon layui-icon-console",
+		"type": 0,
+		"href": "",
+		"children": [
+			{
+				"id": "ruleQuery",
+				"title": "规则管理",
+				"icon": "layui-icon layui-icon-face-smile",
+				"type": 1,
+				"openType": "_iframe",
+				"href": "/rule/view"
+			},
+			{
+				"id": "spiderMonitor",
+				"title": "采集监控",
+				"icon": "layui-icon layui-icon-face-smile",
+				"type": 1,
+				"openType": "_iframe",
+				"href": "/view/spider/monitor.html"
+			},
+			{
+				"id": "ruleTest",
+				"title": "规则测试",
+				"icon": "layui-icon layui-icon-face-smile",
+				"type": 1,
+				"openType": "_iframe",
+				"href": "/rule/testView"
+			}
+		]
+	}
+]

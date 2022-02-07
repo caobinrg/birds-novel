@@ -1,0 +1,68 @@
+{
+  "logo": {
+    "title": "飞鸟小说",
+    "image": "/admin/images/logo.png"
+  },
+  "menu": {
+    "data": "admin/data/menu.json",
+    "method": "GET",
+    "accordion": true,
+    "collaspe": false,
+    "control": false,
+    "controlWidth": 500,
+    "select": "10",
+    "async": true
+  },
+  "tab": {
+    "enable": true,
+    "keepState": true,
+    "session": false,
+    "max": "30",
+    "index": {
+      "id": "10",
+      "href": "/console",
+      "title": "数据统计"
+    }
+  },
+  "theme": {
+    "defaultColor": "2",
+    "defaultMenu": "dark-theme",
+    "defaultHeader": "light-theme",
+    "allowCustom": true,
+    "banner": false
+  },
+  "colors": [
+    {
+      "id": "1",
+      "color": "#2d8cf0",
+      "second": "#ecf5ff"
+    },
+    {
+      "id": "2",
+      "color": "#36b368",
+      "second": "#f0f9eb"
+    },
+    {
+      "id": "3",
+      "color": "#f6ad55",
+      "second": "#fdf6ec"
+    },
+    {
+      "id": "4",
+      "color": "#f56c6c",
+      "second": "#fef0f0"
+    },
+    {
+      "id": "5",
+      "color": "#3963bc",
+      "second": "#ecf5ff"
+    }
+  ],
+  "other": {
+    "keepLoad": "1200",
+    "autoHead": false
+  },
+  "header": {
+    "message": "admin/data/message.json"
+  }
+}

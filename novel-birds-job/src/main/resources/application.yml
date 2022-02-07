@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: novel-birds-crawler
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true

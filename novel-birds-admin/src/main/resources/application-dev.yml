@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    include: service-dev
+  jpa:
+    show-sql: true
+login:
+  userName: "admin"
+  passWord: "birds"

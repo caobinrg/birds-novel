@@ -1,0 +1,5 @@
+spring:
+  profiles:
+    include: service-prod,website
+  jpa:
+    show-sql: true

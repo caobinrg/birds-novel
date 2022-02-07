@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(title='index1',keywords='',description='')">
+    </head>
+    <style>
+        .Mywallet{
+            position: relative;
+            margin: auto;
+            width:80%;
+            background-color:#ffffff80;
+            height:80pt;
+            border-radius:10px;
+        }
+        .van-card__thumb {
+            position: relative;
+            -webkit-box-flex: 0;
+            -webkit-flex: none;
+            flex: none;
+            width: 58pt;
+            height: 58pt;
+            margin-right: 4px;
+        }
+        .myownrow{
+            margin-top:1pt;
+            margin-left:20pt;
+            margin-right:20pt;
+            background-color: white;
+        }
+
+        .Cheadme{
+            background: url('../../static/mobile/img/bird.jpg') no-repeat;
+            height:160pt;
+            background-size:cover;
+        }
+        .CVcardme
+        {
+            background-color: #ffffff00;
+        }
+
+    </style>
+
+</head>
+<body>
+<div id="app">
+
+    <div>
+        <div class="Cheadme">
+            <van-card class="CVcardme" style="padding-right:0pt;">
+                <template #thumb>
+                    <van-image round="" width="56pt"  height="56pt"  fit="contain"  src="/static/mobile/img/bird.jpg"/>
+                </template>
+                <template #desc >
+                    <van-row style="margin-top:18pt;padding-right:0pt;">
+                        <van-col span="18">
+                            <label style="color:#F7F7F7;font-size:15pt;">
+                                {{user.viewName}}
+                            </label>
+                        </van-col>
+                    </van-row>
+                </template>
+<!--                <div slot="desc" >-->
+<!--                  -->
+<!--                </div>-->
+            </van-card>
+            <van-row style="width:100%">
+                <div  class="Mywallet">
+                    <div style="width:100%;height:20pt">
+                        <label style="float:left;margin-left:10pt;color:white;margin-top:7pt;font-size:10pt">我的钱包</label>
+                        <label style="float:right;margin-right:10pt;color:white;margin-top:7pt;font-size:10pt">明细 ></label>
+                    </div>
+                    <div style="width:100%;height:35pt;">
+                        <div style="display:block;margin:0 auto;width:150pt;color:white;font-size:20pt;padding-top:10pt;">
+                            <label style="display:block;margin:0 auto;text-align:center;width:100pt;">0</label>
+                        </div>
+                    </div>
+                    <div style="width:100%;height:20pt;">
+                        <div style="display:block;margin:0 auto;width:150pt;color:white;font-size:10pt;padding-top:1pt;">
+                            <label style="display:block;margin:0 auto;text-align:center;width:100pt;">余额（元）</label>
+                        </div>
+                    </div>
+                </div>
+            </van-row>
+        </div>
+        <van-row >
+            <van-cell title="我的消息"  icon="volume-o"    style="height:40pt;" />
+        </van-row>
+<!--        <van-row >-->
+<!--            <van-cell title="浏览记录"  icon="todo-list-o"   style="height:40pt;" />-->
+<!--        </van-row>-->
+        <van-row >
+            <van-cell title="客服咨询"   icon="service-o"   style="height:40pt;" />
+        </van-row>
+<!--        <van-row >-->
+<!--            <van-cell title="设置"   icon="setting-o" style="height:40pt;" />-->
+<!--        </van-row>-->
+    </div>
+    <div style="margin-top:6rem;margin-left:  4rem;margin-right: 4rem">
+        <van-button v-if="isLogin" round block type="default" color="#d1d6d4" @click="clickToUnLogin">
+            注销
+        </van-button>
+        <van-button v-else round block type="default" color="#1989fa" @click="clickToLogin">
+            登陆
+        </van-button>
+    </div>
+
+    <van-popup v-model:show="userLoginShow" position="bottom" :close-on-popstate="true" :closeable="true"
+               :style="{ width: '100%' ,height: '100%', 'background-color':'#f7f8fa' }">
+        <van-nav-bar title="登录"></van-nav-bar>
+        <van-form style="margin: 40px 15px 0 15px">
+            <van-field
+                    v-model="username"
+                    name="账号"
+                    label="账号"
+                    placeholder="账号"
+                    :rules="[{ required: true, message: '请填写账号' }]"
+            ></van-field>
+            <van-field
+                    v-model="password"
+                    :type="isPassword"
+                    name="密码"
+                    label="密码"
+                    placeholder="密码"
+                    :rules="[{ required: true, message: '请填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
+            >
+                <template #right-icon>
+                    <van-icon name="eye-o" @click="isPasswordChange"/>
+                </template>
+            </van-field>
+            <van-field
+                    v-if="isRegister"
+                    v-model="confirmPassword"
+                    :type="isPassword"
+                    name="密码确认"
+                    label="密码确认"
+                    placeholder="密码确认"
+                    :rules="[{ required: true, message: '请再次填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
+            >
+                <template #right-icon>
+                    <van-icon name="eye-o" @click="isPasswordChange"/>
+                </template>
+            </van-field>
+            <div>
+                <div style="margin: 16px;">
+                    <van-button round block type="primary" native-type="submit" @click="onSubmit">
+                        {{subButtonText}}
+                    </van-button>
+                </div>
+                <div style="text-align:center;" >
+                    <div @click="toRegister">没有账号？立即注册</div>
+                </div>
+            </div>
+
+        </van-form>
+    </van-popup>
+
+
+    <div th:replace="mobile/common/footer::tabbar"></div>
+</div>
+
+<div th:replace="mobile/common/footer::copyright"></div>
+<script th:inline="javascript">
+    // 在 #app 标签下渲染一个按钮组件
+    const app = Vue.createApp({
+        data:()=>({
+            active: 2,
+            isLogin: [[${isLogin}]],
+            user: [[${user}]],
+            userLoginShow:false,
+            username:"",
+            password:"",
+            confirmPassword:"",
+            isPassword:"password",
+            isRegister:false,
+            subButtonText:"登录",
+            isRegisterText:"没有账号？立即注册"
+        }),
+        methods:{
+            clickToLogin(){
+                this.userLoginShow = true
+            },
+            clickToUnLogin(){
+                var self = this;
+                $.ajax({
+                    url: '/api/user/loginOut',
+                    type: 'post',
+                    data: {},
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        self.isLogin = false;
+                        self.user = {};
+                        vant.Toast("注销成功")
+                    }else{
+                        vant.Toast("注销失败")
+                    }
+                }).fail(function () {
+                    vant.Toast("出错了")
+                });
+            },
+            isPasswordChange:function () {
+                if(this.isPassword == "password"){
+                    this.isPassword = "text"
+                }else{
+                    this.isPassword = "password"
+                }
+            },
+            toRegister:function () {
+                if(!this.isRegister){
+                    this.isRegister = true
+                    this.subButtonText = "注册"
+                    this.isRegisterText = "已有账号？请登录"
+                }else{
+                    this.isRegister = false
+                    this.subButtonText = "登录"
+                    this.isRegisterText = "没有账号？立即注册"
+                }
+            },
+            onSubmit:function () {
+                if(this.isRegister){
+                    //注册
+                    if(this.password == "" || this.confirmPassword == "" || this.password != this.confirmPassword ){
+                        vant.Toast("请确认两次密码输入是否一致")
+                    }
+                    var self = this;
+                    $.ajax({
+                        url: '/api/user/register',
+                        type: 'post',
+                        data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }).then(function (res) {
+                        if(res!=undefined && res.success == true){
+                            vant.Toast("注册成功")
+                            self.user = res.data;
+                            self.isLogin = true;
+                            self.userLoginShow = false;
+                        }else{
+                            vant.Toast(res.msg ? res.msg : "注册失败")
+                        }
+                    }).fail(function () {
+                        vant.Toast("注册失败！")
+                    });
+                }else{
+                    var self = this;
+                    $.ajax({
+                        url: '/api/user/login',
+                        type: 'post',
+                        data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
+                        dataType: 'json',
+                        contentType: 'application/json',
+                    }).then(function (res) {
+                        if(res!=undefined && res.success == true){
+                            vant.Toast("登录成功")
+                            self.user = res.data;
+                            self.isLogin = true;
+                            self.userLoginShow = false;
+                        }else{
+                            vant.Toast(res.msg ? res.msg : "登录失败")
+                        }
+                    }).fail(function () {
+                        vant.Toast("登录失败！")
+                    });
+                }
+            }
+        }
+    }).use(vant).mount("#app")
+</script>
+</body>
+
+
+</html>

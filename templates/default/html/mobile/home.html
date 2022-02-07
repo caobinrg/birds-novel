@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书城_' + webSiteName},
+    keywords=${'书城,' + webSiteKeywords},
+    description=${'书城,'+webSiteDescription})">
+    </head>
+    <style scoped>
+        .van-nav-bar__content{
+            z-index: 2 !important;
+        }
+        .van-tabs__line{
+            z-index: 3 !important;
+        }
+        .rank{
+            display: flex !important;
+        }
+        .rankMenu{
+            width: 20% !important;
+        }
+        .rankContent{
+            width: 80% !important;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="#bar">
+<!--        <van-nav-bar title="书城"  />-->
+    </div>
+    <div >
+        <van-tabs >
+            <van-tab title="精选">
+                <div th:replace="mobile/home/handpick ::handpick"></div>
+            </van-tab>
+            <van-tab title="分类" >
+                <div th:replace="mobile/home/classify ::classify"></div>
+            </van-tab>
+            <van-tab title="排行">
+                <div th:replace="mobile/home/rank ::rank"></div>
+            </van-tab>
+        </van-tabs>
+    </div>
+    <van-divider dashed>到底了</van-divider>
+
+    <div th:replace="mobile/common/footer::tabbar"></div>
+</div>
+
+<div th:replace="mobile/common/footer::copyright"></div>
+</body>
+<script th:src="@{/static/mobile/js/novel-light.js}"></script>
+<script th:src="@{/static/mobile/js/notice-bar.js}"></script>
+<script th:inline="javascript">
+    // 在 #app 标签下渲染一个按钮组件
+    const app = Vue.createApp({
+        components: {
+            'novel-light': novel_light,
+            "notice-bar":notice_bar
+        },
+        data: () =>({
+            //总页面属性
+            active: 0,
+            //handpick页面属性
+            novels:[[${novels}]],
+            notice:{
+                info:["技术是开发它的人的共同灵魂","在代码阅读过程中人们说脏话的频率是衡量代码质量的唯一标准。"]
+            },
+            //search
+            isSearchPop:false,
+            searchText:"",
+            searchPageNo: 1,
+            searchTotal: 0,
+            searchPageSize: 5,
+            searchResult:[],
+            //分类页面属性
+            classifyPageNo: 1,
+            classifyTotal: 0,
+            classifyPageSize: 5,
+            classifyValue: "玄幻奇幻",
+            classifyOption: [
+                { text: '玄幻奇幻', value: '玄幻奇幻' },
+                { text: '武侠仙侠', value: '武侠仙侠' },
+                { text: '都市言情', value: '都市言情' },
+                { text: '历史军事', value: '历史军事' },
+                { text: '科幻灵异', value: '科幻灵异' },
+                { text: '网游竞技', value: '网游竞技' },
+                { text: '女生频道', value: '女生频道' },
+                { text: '其他', value: '其他' },
+            ],
+            classifyNovels:[],
+            //排行页面属性
+            rankActive:0,
+            rankNovels: {
+                "0":[],
+                "1":[],
+                "2":[]
+            }
+        }),
+        created:function(){
+            this.$options.methods.loadClassifyNovels(this);
+            this.$options.methods.loadRankNovels(this);
+        },
+        methods: {
+            shortageClick(){
+                var self = this;
+                $.ajax({
+                    url: '/api/novel/shortage',
+                    type: 'post',
+                    data: {},
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        console.log(res)
+                        self.novels.shortage =  res.data
+                    }
+                }).fail(function () {
+                    vant.Toast("出错了")
+                });
+
+            },
+            classifyPageChange(){
+                this.$options.methods.loadClassifyNovels(this);
+            },
+            classifyMenuChange(){
+                this.classifyPageNo = 1;
+                this.$options.methods.loadClassifyNovels(this);
+            },
+            loadClassifyNovels(self){
+                if(self == undefined){
+                    self = this;
+                }
+                $.ajax({
+                    url: '/api/novel/getNovelByNovelType',
+                    type: 'post',
+                    data: JSON.stringify({"pageNo":self.classifyPageNo,
+                        "pageSize":self.classifyPageSize,
+                        "novelType":self.classifyValue}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        var classifyData = res.data
+                        self.classifyTotal = classifyData.total
+                        self.classifyNovels = classifyData.data
+                    }
+                }).fail(function (error) {
+                    vant.Toast("出错了")
+                });
+            },
+            rankActiveChange(){
+                this.$options.methods.loadRankNovels(this);
+            },
+            loadRankNovels(self){
+                if(self == undefined){
+                    self = this;
+                }
+                if(self.rankNovels[self.rankActive].length > 0){
+                    return
+                }
+                $.ajax({
+                    url: '/api/novel/converInfo',
+                    type: 'post',
+                    data: JSON.stringify({"rankType":self.rankActive}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        self.rankNovels[self.rankActive] = res.data
+                    }
+                }).fail(function (error) {
+                    vant.Toast("出错了")
+                });
+            },
+            onNovelClick(event,item){
+                window.location = item.novelUrl;
+            },
+            onSearchClick(){
+                if(this.searchText == undefined || this.searchText.trim() == ""){
+                    vant.Toast("请输入关键字")
+                }else{
+                    this.searchResult = [];
+                    this.searchTotal = 0;
+                    if(!this.isSearchPop){
+                        this.isSearchPop = true;
+                    }
+                    this.$options.methods.loadSearchData(this);
+                }
+            },
+            searchPageChange(){
+                this.$options.methods.loadSearchData(this);
+            },
+            loadSearchData(self){
+                if(self == undefined){
+                    self = this;
+                }
+                $.ajax({
+                    url: '/api/novel/searchNovelByNovelName',
+                    type: 'post',
+                    data: JSON.stringify({"pageNo":self.searchPageNo,
+                        "pageSize":self.searchPageSize,
+                        "novelName":self.searchText}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        var searchData = res.data
+                        self.searchTotal = searchData.total
+                        self.searchResult = searchData.data
+                    }
+                }).fail(function (error) {
+                    vant.Toast("出错了")
+                });
+            }
+
+        },
+    }).use(vant).mount("#app")
+</script>
+</html>

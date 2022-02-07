@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>数据表格</title>
+		<link rel="stylesheet" href="../../component/pear/css/pear.css" th:href="@{/component/pear/css/pear.css}" />
+		<style>
+			.layui-form-item .layui-input-inline {
+				width: 23em;
+			}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<form class="layui-form" action="" lay-filter="rule-form" onsubmit="return false">
+
+
+					<blockquote class="layui-elem-quote">网址</blockquote>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">url</label>
+						<div class="layui-input-inline">
+							<input type="text" name="sourceUrl" required  lay-verify="required|url" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">规则</label>
+						<div class="layui-input-inline">
+							<input type="text" name="xpathText" required  lay-verify="required" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<!--内容规则结束-->
+					<blockquote class="layui-elem-quote">测试结果</blockquote>
+
+					<div class="layui-form-item layui-form-text" style="padding-right: 10em;">
+						<div class="layui-input-block">
+							<textarea name="pageResult" placeholder="页面数据" class="layui-textarea pageResult" style="height: 25em"></textarea>
+						</div>
+					</div>
+
+					<div class="layui-form-item layui-form-text" style="padding-right: 10em;">
+						<div class="layui-input-block">
+							<textarea name="textResult" placeholder="测试结果" class="layui-textarea textResult" style="height: 5em"></textarea>
+						</div>
+					</div>
+
+					<!--测试结果结束-->
+					<hr>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button class="layui-btn layui-btn-normal" lay-submit lay-filter="test">测试</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<script src="../../component/layui/layui.js" th:src="@{/component/layui/layui.js}"></script>
+		<script src="../../component/pear/pear.js" th:src="@{/component/pear/pear.js}"></script>
+		<script th:inline="javascript">
+			layui.use(['table', 'form', 'jquery', 'drawer', 'dropdown'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let drawer = layui.drawer;
+				let MODULE_PATH = "/rule/";
+
+				form.val("rule-form",[[${ruleData}]]);
+
+				form.on('submit(test)', function(data){
+					let loading = layer.load();
+					$.ajax({
+						url: MODULE_PATH + "xpathTest",
+						dataType: 'json',
+						contentType: "application/json;charset=UTF-8",
+						type: 'post',
+						data: JSON.stringify(data.field),
+						success: function (result) {
+							layer.close(loading);
+							$(".pageResult").val(result.data.pageResult)
+							$(".textResult").val(result.data.textResult)
+						}
+					})
+				});
+			})
+		</script>
+	</body>
+</html>

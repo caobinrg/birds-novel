@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: novel-birds-web
+  profiles:
+    active: dev
+  thymeleaf:
+    prefix: file:templates/${templates.name}/html/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+    check-template-location: true
+server:
+  port: 20100
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        Secure: false
+thymeleaf:
+  static: file:templates/${templates.name}/static/

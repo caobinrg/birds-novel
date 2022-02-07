@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>footer</title>
+</head>
+<body>
+
+    <div th:fragment="tabbar">
+        <van-tabbar v-model="active" :route="true">
+            <van-tabbar-item icon="home-o" replace url = "/web/home">书城</van-tabbar-item>
+            <van-tabbar-item icon="bookmark-o" replace url = "/web/bookrack">书架</van-tabbar-item>
+            <van-tabbar-item icon="user-o" replace url = "/web/user">我的</van-tabbar-item>
+        </van-tabbar>
+    </div>
+
+
+
+    <div th:fragment="copyright">
+<!--        © 2016 xxx-->
+    </div>
+</body>
+</html>

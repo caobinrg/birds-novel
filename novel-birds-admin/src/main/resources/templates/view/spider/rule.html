@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>数据表格</title>
+		<link rel="stylesheet" href="/component/pear/css/pear.css" th:href="@{/component/pear/css/pear.css}" />
+	</head>
+	<body class="pear-container">
+		<div class="layui-card">
+			<div class="layui-card-body">
+				<table id="rule-table" lay-filter="rule-table"></table>
+			</div>
+		</div>
+
+		<script type="text/html" id="rule-enable">
+			<input type="checkbox" name="openStatus" value="{{d.ruleId}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="rule-enable"
+				   {{ d.openStatus == 1 ? 'checked' : '' }}>
+		</script>
+
+		<script type="text/html" id="rule-toolbar">
+			<button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+				<i class="layui-icon layui-icon-add-1"></i>
+				新增
+			</button>
+		</script>
+
+		<script type="text/html" id="rule-bar">
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i
+					class="layui-icon layui-icon-edit"></i></button>
+			<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="copy"><i
+					class="layui-icon layui-icon-add-circle"></i></button>
+			<button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i
+					class="layui-icon layui-icon-delete"></i></button>
+		</script>
+
+		<script src="/component/layui/layui.js" th:src="@{/component/layui/layui.js}"></script>
+		<script src="/component/pear/pear.js" th:src="@{/component/pear/pear.js}"></script>
+		<script>
+			layui.use(['table', 'form', 'jquery', 'drawer', 'dropdown'], function() {
+				let table = layui.table;
+				let form = layui.form;
+				let $ = layui.jquery;
+				let drawer = layui.drawer;
+				let MODULE_PATH = "/rule/";
+				let cols = [
+					[
+						{
+							title: '规则ID',
+							field: 'ruleId',
+							align: 'center',
+						},
+						{
+							title: '规则名称',
+							field: 'ruleName',
+							align: 'center'
+						},
+						{
+							title: '初始化状态',
+							field: 'initStatus',
+							align: 'center',
+						},
+						{
+							title: '日常采集间隔时间',
+							field: 'initAfterInterval',
+							align: 'center',
+						},
+						{
+							title: '启用',
+							field: 'openStatus',
+							align: 'center',
+							templet: '#rule-enable'
+						},
+						{
+							title: '操作',
+							toolbar: '#rule-bar',
+							align: 'center',
+							width: 160,
+							fixed: 'right'
+						}
+					]
+				]
+
+				table.render({
+					elem: '#rule-table',
+					url: '/rule/getAllRule',
+					method: 'post',
+					contentType: 'application/json',
+					// request: {
+					// 	pageName: 'pageNo' //页码的参数名称，默认：page
+					// 	,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+					// },
+					parseData: function(res){ //res 即为原始返回的数据
+						return {
+							"code": res.success, //解析接口状态
+							"msg": res.msg, //解析提示文本
+							"count": res.data.total, //解析数据长度
+							"data": res.data //解析数据列表
+						}
+					},
+					response: {
+						statusCode: true //规定成功的状态码，默认：0
+					},
+					page: false,
+					cols: cols,
+					skin: 'line',
+					toolbar: '#rule-toolbar',
+					defaultToolbar: []
+				});
+
+				table.on('tool(rule-table)', function(obj) {
+					if (obj.event === 'remove') {
+						window.remove(obj);
+					}else if(obj.event === 'edit'){
+						window.edit(obj);
+					}else if(obj.event === 'copy'){
+						window.copy(obj);
+					}
+				});
+
+				table.on('toolbar(rule-table)', function(obj) {
+					if (obj.event === 'add') {
+						window.add();
+					}
+				});
+
+				form.on('switch(rule-enable)', function(obj) {
+					let ruleId = this.value;
+					let path = "";
+					if(obj.elem.checked){
+						path = "openRule";
+					}else{
+						path = "closeRule";
+					}
+					$.ajax({
+						url: MODULE_PATH + path,
+						dataType: 'json',
+						// contentType: "application/json;charset=UTF-8",
+						type: 'post',
+						data: {"ruleId":ruleId},
+						success: function (result) {
+							if(result.success){
+								table.reload('rule-table');
+							}
+						}
+					})
+				});
+
+				window.add = function() {
+					let index = layer.open({
+						type: 2,
+						maxmin: false,
+						title: "规则添加",
+						content: "/rule/edit"
+					});
+					layer.full(index);
+				}
+
+				window.edit = function(obj) {
+					let index = layer.open({
+						type: 2,
+						maxmin: false,
+						title: "规则编辑",
+						content: "/rule/edit/"+obj.data["ruleId"]
+					});
+					layer.full(index);
+				}
+
+				window.copy = function(obj){
+					let index = layer.open({
+						type: 2,
+						maxmin: false,
+						title: "规则复制",
+						content: "/rule/copy/"+obj.data["ruleId"]
+					});
+					layer.full(index);
+				}
+
+				window.remove = function(obj) {
+					layer.confirm('确定要删除该规则', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						layer.close(index);
+						let loading = layer.load();
+						$.ajax({
+							url: MODULE_PATH + "delRule",
+							dataType: 'json',
+							// contentType: "application/json;charset=UTF-8",
+							type: 'post',
+							data : {"ruleId":obj.data.ruleId},
+							success: function(result) {
+								layer.close(loading);
+								if (result.success) {
+									layer.msg(result.msg, {
+										icon: 1,
+										time: 1000
+									}, function() {
+										obj.del();
+									});
+								} else {
+									layer.msg(result.msg, {
+										icon: 2,
+										time: 1000
+									});
+								}
+							}
+						})
+					});
+				}
+				window.refreshTable = function () {
+					table.reload('rule-table');
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <contextName>${HOSTNAME}</contextName>
+
+    <!-- 定义参数 -->
+    <property name="LOG_LEVEL" value="INFO"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" />
+    <!-- 日志根目录-->
+    <springProperty scope="context" name="LOG_HOME" source="project.log.path"  defaultValue="logs"/>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(${LOG_LEVEL_PATTERN:-%5p}) ${PID:- } --- %cyan([%t] %-40.40logger{39}) : %m%n"/>
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n"/>
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder默认配置为PartternLayoutEncoder    -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!-- 循环文件输出（基于时间戳的分文件，是实际项目中用途最广的一种情况） -->
+    <appender name="ROLLINGFILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.debug.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- 异步输出 -->
+    <appender name="AROLLINGFILE_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>1</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ROLLINGFILE_DEBUG"/>
+    </appender>
+
+    <!-- 循环文件输出（基于时间戳的分文件，是实际项目中用途最广的一种情况） -->
+    <appender name="ROLLINGFILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.info.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- 异步输出 -->
+    <appender name="AROLLINGFILE_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>1</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ROLLINGFILE_INFO"/>
+    </appender>
+
+    <!-- 循环文件输出（基于时间戳的分文件，是实际项目中用途最广的一种情况） -->
+    <appender name="ROLLINGFILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.warn.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="AROLLINGFILE_WARN" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>512</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>1</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ROLLINGFILE_WARN"/>
+    </appender>
+
+    <!-- ERROR 循环文件输出（基于时间戳的分文件，是实际项目中用途最广的一种情况） -->
+    <appender name="ROLLINGFILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.error.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- ERROR 异步输出 -->
+    <appender name="AROLLINGFILE_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>512</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>1</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="ROLLINGFILE_ERROR"/>
+    </appender>
+
+    <!--引入第三方appender, 起名为http-->
+    <appender name="HTTP" class="ch.qos.logback.ext.loggly.LogglyAppender">
+        <!--请求的地址-->
+        <endpointUrl>${ALARM_URL}${APP_NAME}</endpointUrl>
+        <!--定义输出格式JSON-->
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+
+            <jsonFormatter
+                    class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>true</prettyPrint>
+            </jsonFormatter>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+        </layout>
+        <!-- 这里采用等级过滤器 指定等级相符才发送 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="AROLLINGFILE_DEBUG"/>
+            <appender-ref ref="AROLLINGFILE_INFO"/>
+            <appender-ref ref="AROLLINGFILE_WARN"/>
+            <appender-ref ref="AROLLINGFILE_ERROR"/>
+        </root>
+    </springProfile>
+    <springProfile name="beta">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="AROLLINGFILE_DEBUG"/>
+            <appender-ref ref="AROLLINGFILE_INFO"/>
+            <appender-ref ref="AROLLINGFILE_WARN"/>
+            <appender-ref ref="AROLLINGFILE_ERROR"/>
+            <appender-ref ref="HTTP"/>
+        </root>
+    </springProfile>
+    <springProfile name="dev">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="AROLLINGFILE_DEBUG"/>
+            <appender-ref ref="AROLLINGFILE_INFO"/>
+            <appender-ref ref="AROLLINGFILE_WARN"/>
+            <appender-ref ref="AROLLINGFILE_ERROR"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="AROLLINGFILE_DEBUG"/>
+            <appender-ref ref="AROLLINGFILE_INFO"/>
+            <appender-ref ref="AROLLINGFILE_WARN"/>
+            <appender-ref ref="AROLLINGFILE_ERROR"/>
+            <appender-ref ref="HTTP"/>
+        </root>
+    </springProfile>
+</configuration>

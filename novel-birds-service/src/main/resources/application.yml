@@ -1,0 +1,4 @@
+spring:
+  profiles:
+    include: service-dev
+    active: dev
