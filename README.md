@@ -23,7 +23,7 @@
 | Thymeleaf            | 模板引擎     
 | Layui                | 前端UI   
 | Vue                  | 前端UI 
-| vant                 | 前端UI框架    
+| Vant                 | 前端UI
 | Pear Admin           | 前端框架  
 
 #### 项目演示站
