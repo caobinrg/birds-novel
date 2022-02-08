@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <head th:replace="mobile/common/header :: common_header(title='index1',keywords='',description='')">
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'用户_' + webSiteName},
+    keywords=${'用户,' + webSiteKeywords},
+    description=${'用户,'+webSiteDescription})">
     </head>
     <style>
         .Mywallet{
