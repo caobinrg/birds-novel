@@ -55,7 +55,7 @@ public class NovelService {
             if(null == dbNovel){
                 return this.novelRepository.save(novel);
             }
-            if(novel.getName().equals(dbNovel.getName())){
+            if(novel.getName().equals(dbNovel.getName()) && novel.getRuleId().equals(dbNovel.getRuleId())){
                 novel.setId(dbNovel.getId());
                 return this.novelRepository.save(novel);
             }
