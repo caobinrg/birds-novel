@@ -79,7 +79,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         boolean has = urlSet.contains(request.getUrl());
         if(Boolean.FALSE.equals(has)) {
             // 将url加入到redis set中
-            urlSet.add(request.getUrl(),3, TimeUnit.MINUTES);
+            urlSet.add(request.getUrl(),60, TimeUnit.MINUTES);
             return false;
         } else {
             return true;
