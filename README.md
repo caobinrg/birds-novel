@@ -121,7 +121,7 @@ caobincoding@163.com
 - 开源不易，且行且珍惜。
 - 您的赞赏与鼓励，意见及建议是我最大的动力
 
-![赞赏](https://s4.ax1x.com/2022/02/07/HQ8uh8.png)
+![打赏码.png](https://s2.loli.net/2022/02/08/AxEF3LIK9vJrp7P.png)
 
 
 #### 免责声明
