@@ -34,7 +34,6 @@ public class JobRemoteService {
     private RedissonClient redissonClient;
 
 
-
     public boolean startRule(CrawlerRule crawlerRule){
         CrawlerListRule listRule = crawlerRule.getListRule();
         String sourceUrl = listRule.getSourceUrl();
@@ -48,7 +47,7 @@ public class JobRemoteService {
         request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
         RRemoteService remoteService = redissonClient.getRemoteService();
         SpiderJobStartRemote spiderJobStartRemote = remoteService.get(SpiderJobStartRemote.class);
-        if( spiderJobStartRemote.getSpiderStatus() == 0){
+        if( spiderJobStartRemote.getStarStatus() == 0){
             spiderJobStartRemote.start();
             return true;
         }

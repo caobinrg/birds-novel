@@ -36,4 +36,6 @@ public class CrawlerRequestDto implements Serializable {
     private Integer type;
 
     private String  countDownSpace;
+
+    private boolean jump;
 }

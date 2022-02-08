@@ -10,6 +10,7 @@ import com.leqiwl.novel.service.NovelConverService;
 import com.leqiwl.novel.service.NovelService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -44,6 +45,7 @@ public class StarQueueMessageReceive implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         while (true){
+            RLock lock = null;
             try {
                 RBlockingQueue<NovelIdTopicDto> blockingQueue =
                         redissonClient.getBlockingQueue(TopicAndQueueKeyConst.STAR_QUEUE);
@@ -54,6 +56,8 @@ public class StarQueueMessageReceive implements ApplicationRunner {
                 if(StrUtil.isBlank(novelId)){
                     continue;
                 }
+                lock = redissonClient.getLock(novelId);
+                lock.tryLock(3,6,TimeUnit.SECONDS);
                 NovelConver novelConver = novelConverService.getByNovelId(novelId);
                 if(null != novelConver){
                     //更新数据
@@ -75,6 +79,10 @@ public class StarQueueMessageReceive implements ApplicationRunner {
                 novelConverService.save(novelConver);
             } catch (InterruptedException e) {
                 log.info(e.getMessage(),e);
+            }finally {
+                if(null != lock){
+                    lock.unlock();
+                }
             }
             try {
                 TimeUnit.MILLISECONDS.sleep(500);

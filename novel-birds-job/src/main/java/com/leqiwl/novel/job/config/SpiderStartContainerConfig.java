@@ -21,7 +21,7 @@ import java.util.Collections;
  * @Description: SpiderStartContainer注入
  */
 @Slf4j
-@Configuration
+//@Configuration
 public class SpiderStartContainerConfig {
 
     @Value("${spider.threadNum:0}")

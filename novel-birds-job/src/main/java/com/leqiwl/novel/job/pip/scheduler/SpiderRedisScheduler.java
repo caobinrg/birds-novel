@@ -95,7 +95,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             return;
         }
         Integer type = requestInfo.getType();
-        if(CrawlerTypeEnum.CONTENT.getType().equals(type)){
+        if(CrawlerTypeEnum.CONTENT.getType().equals(type) && !requestInfo.isJump()){
             deque.addLast(request);
             return;
         }
@@ -162,17 +162,6 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         return urlSet.size();
     }
 
-
-    public void jumpQueue(Request request,String domain){
-        if(StrUtil.isBlank(domain)){
-            String url = request.getUrl();
-            UrlBuilder urlBuilder = UrlBuilder.ofHttp(url, CharsetUtil.CHARSET_UTF_8);
-            domain = urlBuilder.getHost();
-        }
-        RDeque<Object> deque =
-                redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_PREFIX + domain);
-        deque.addFirst(request);
-    }
 
     public void delAllRequest(String domain){
         RDeque<Object> deque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_PREFIX + domain);
