@@ -108,8 +108,8 @@ public class NovelListProcessor implements NovelProcessor {
             return;
         }
         long initAfterInterval = crawlerInfo.getInitAfterInterval();
-        if(initAfterInterval < 5){
-            initAfterInterval = 5;
+        if(initAfterInterval < 15){
+            initAfterInterval = 15;
         }
         String delayUrl = url.replace(RequestConst.PAGE_REPLACE,
                 delayStartPage +"");
