@@ -5,7 +5,6 @@ import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.job.pip.listener.SpiderEventListener;
 import com.leqiwl.novel.job.pip.scheduler.SpiderRedisScheduler;
-import com.leqiwl.novel.remote.SpiderContainerRemote;
 import org.apache.commons.collections.CollectionUtils;
 import org.redisson.api.RCountDownLatch;
 import org.redisson.api.RedissonClient;
