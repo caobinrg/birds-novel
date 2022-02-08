@@ -56,6 +56,7 @@ public class SpringCacheRedisConfig {
         redisCacheConfigurationMap.put("10m", this.getRedisCacheConfigurationWithTtl(10 * 60));
         redisCacheConfigurationMap.put("5m", this.getRedisCacheConfigurationWithTtl(5 * 60));
         redisCacheConfigurationMap.put("2m", this.getRedisCacheConfigurationWithTtl(2 * 60));
+        redisCacheConfigurationMap.put("1m", this.getRedisCacheConfigurationWithTtl(1 * 60));
         return redisCacheConfigurationMap;
     }
 

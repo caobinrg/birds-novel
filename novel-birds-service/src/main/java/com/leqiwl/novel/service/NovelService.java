@@ -39,12 +39,12 @@ public class NovelService {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @CachePut(cacheNames = "novel#10m", key="#novel.getIdMark()")
+    @CachePut(cacheNames = "novel#2m", key="#novel.getIdMark()")
     public Novel save(Novel novel){
         return this.novelRepository.save(novel);
     }
 
-    @Cacheable(cacheNames = "novel#10m", key = "#idMark")
+    @Cacheable(cacheNames = "novel#2m", key = "#idMark")
     public Novel getByIdMark(String idMark){
         Novel novel = this.novelRepository.getNovelByIdMark(idMark);
         if(null == novel){
@@ -53,7 +53,7 @@ public class NovelService {
         return novel;
     }
 
-    @Cacheable(cacheNames = "novel#10m", key = "#novelId")
+    @Cacheable(cacheNames = "novel#2m", key = "#novelId")
     public Novel getByNovelId(String novelId){
         Novel novel = this.novelRepository.getNovelByNovelId(novelId);
         if(null == novel){
