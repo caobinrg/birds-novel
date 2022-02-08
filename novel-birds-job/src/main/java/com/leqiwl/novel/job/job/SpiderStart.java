@@ -1,12 +1,15 @@
 package com.leqiwl.novel.job.job;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.core.util.CharsetUtil;
 import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerListRule;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerRule;
 import com.leqiwl.novel.enums.CrawlerTypeEnum;
 import com.leqiwl.novel.job.pip.SpiderStartContainer;
+import com.leqiwl.novel.job.pip.SpiderStartContainerFactory;
+import com.leqiwl.novel.remote.SpiderContainerRemote;
 import com.leqiwl.novel.remote.SpiderJobStartRemote;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +32,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @Order(99)
-public class SpiderStart implements ApplicationRunner, SpiderJobStartRemote {
+public class SpiderStart implements ApplicationRunner, SpiderContainerRemote,SpiderJobStartRemote {
 
     @Autowired
-    private SpiderStartContainer spiderStartContainer;
+    private SpiderStartContainerFactory spiderStartContainerFactory;
 
     @Resource
     private CrawlerRuleService crawlerRuleService;
@@ -40,7 +43,7 @@ public class SpiderStart implements ApplicationRunner, SpiderJobStartRemote {
     private int status;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args){
         this.start();
     }
 
@@ -63,18 +66,21 @@ public class SpiderStart implements ApplicationRunner, SpiderJobStartRemote {
                     .type(CrawlerTypeEnum.LIST.getType())
                     .build();
             request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
+            SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(getDomain(url));
             spiderStartContainer.addRequest(request);
-        }
-        if(CollectionUtil.isNotEmpty(collect)){
-            spiderStartContainer.start();
+            spiderStartContainer.spiderStart();
             status = 1;
         }
     }
 
+
+
     @Override
-    public int getSpiderStatus() {
+    public int getStarStatus() {
         return this.status;
     }
+
+
 
     public int getStatus() {
         return status;
@@ -82,5 +88,55 @@ public class SpiderStart implements ApplicationRunner, SpiderJobStartRemote {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    private String getDomain(String url){
+        UrlBuilder urlBuilder = UrlBuilder.ofHttp(url, CharsetUtil.CHARSET_UTF_8);
+        return urlBuilder.getHost();
+    }
+
+    @Override
+    public Integer getSpiderStatus(String domain) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+        if(spiderStartContainer == null){
+            return null;
+        }
+        return spiderStartContainer.getSpiderStatus();
+    }
+
+    @Override
+    public void spiderClose(String domain, String countDownSpace) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+        spiderStartContainer.spiderClose(null);
+    }
+
+    @Override
+    public void spiderStop(String domain, String countDownSpace) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+        spiderStartContainer.spiderStop(null);
+    }
+
+    @Override
+    public void spiderStart(String domain) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+            spiderStartContainer.spiderStart();
+    }
+
+    @Override
+    public void spiderStart(String domain, String countDownSpace) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+        spiderStartContainer.spiderStart(countDownSpace);
+    }
+
+    @Override
+    public void spiderJumpQueue(Request request) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(getDomain(request.getUrl()));
+        spiderStartContainer.spiderJumpQueue(request);
+    }
+
+    @Override
+    public void spiderJumpQueue(Request request, String domain) {
+        SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(domain);
+        spiderStartContainer.spiderJumpQueue(request);
     }
 }

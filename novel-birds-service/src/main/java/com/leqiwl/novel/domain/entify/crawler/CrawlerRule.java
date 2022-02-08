@@ -46,7 +46,7 @@ public class CrawlerRule {
 
     /**
      * 初始化完成后执行列表采集间隔时间（单位分钟）
-     * 最小配置为 5分钟，小于5分钟按照默认5分钟计算
+     * 最小配置为 15分钟，小于15分钟按照默认15分钟计算
      */
     @Builder.Default
     private long initAfterInterval = 15;

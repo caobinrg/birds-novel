@@ -1,7 +1,6 @@
 package com.leqiwl.novel.job.register;
 
 import com.leqiwl.novel.job.job.SpiderStart;
-import com.leqiwl.novel.job.pip.SpiderStartContainer;
 import com.leqiwl.novel.remote.SpiderContainerRemote;
 import com.leqiwl.novel.remote.SpiderJobStartRemote;
 import org.redisson.api.RRemoteService;
@@ -26,16 +25,13 @@ public class RemoteJobRegister implements ApplicationRunner {
     private RedissonClient redissonClient;
 
     @Resource
-    private SpiderStartContainer spiderStartContainer;
-
-    @Resource
     private SpiderStart spiderStart;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // spider 注册
         RRemoteService remoteService = redissonClient.getRemoteService();
-        remoteService.register(SpiderContainerRemote.class,spiderStartContainer);
+        remoteService.register(SpiderContainerRemote.class,spiderStart);
         remoteService.register(SpiderJobStartRemote.class,spiderStart);
     }
 }

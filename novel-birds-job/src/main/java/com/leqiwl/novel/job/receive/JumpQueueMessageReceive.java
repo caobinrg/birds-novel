@@ -2,6 +2,7 @@ package com.leqiwl.novel.job.receive;
 
 import com.leqiwl.novel.job.pip.SpiderStartContainer;
 import com.leqiwl.novel.config.sysconst.DelayQueueConst;
+import com.leqiwl.novel.job.pip.SpiderStartContainerFactory;
 import com.leqiwl.novel.service.DelayQueueService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -28,7 +29,7 @@ public class JumpQueueMessageReceive implements ApplicationRunner {
     private DelayQueueService<Request> delayQueueService;
 
     @Resource
-    private SpiderStartContainer spiderStartContainer;
+    private SpiderStartContainerFactory spiderStartContainerFactory;
 
     @Async("birdsExecutor")
     @Override
@@ -38,8 +39,9 @@ public class JumpQueueMessageReceive implements ApplicationRunner {
             try {
                 request = delayQueueService.pullData(DelayQueueConst.CRAWLER_LIST_QUEUE);
                 log.info("接收list采集延时消息：{}",request);
+                SpiderStartContainer spiderStartContainer =
+                        spiderStartContainerFactory.getStartContainer(request);
                 spiderStartContainer.spiderJumpQueue(request);
-                spiderStartContainer.spiderStart();
             } catch (InterruptedException e) {
               log.info(e.getMessage(),e);
             }

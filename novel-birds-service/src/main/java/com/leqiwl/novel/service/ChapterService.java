@@ -29,7 +29,7 @@ public class ChapterService {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @Cacheable(cacheNames = "chapter#10m", key = "#novelId")
+    @Cacheable(cacheNames = "chapter#1m", key = "#novelId")
     public List<Chapter> findByNovelId(String novelId){
         List<Chapter> chapters = chapterRepository.
                 findChapterByNovelIdOrderByChapterIndex(novelId);
@@ -39,7 +39,7 @@ public class ChapterService {
         return chapters;
     }
 
-    @CachePut(cacheNames = "chapter#10m", key = "#chapter.getNovelId()")
+    @CachePut(cacheNames = "chapter#1m", key = "#chapter.getNovelId()")
     public List<Chapter> save(Chapter chapter){
         chapterRepository.save(chapter);
         List<Chapter> chapters = chapterRepository.
@@ -50,7 +50,7 @@ public class ChapterService {
         return chapters;
     }
 
-    @CachePut(cacheNames = "chapter#10m", key = "#novelId")
+    @CachePut(cacheNames = "chapter#1m", key = "#novelId")
     public List<Chapter> save(List<Chapter> chapters,String novelId){
         chapterRepository.saveAll(chapters);
         List<Chapter> chapterList = chapterRepository.

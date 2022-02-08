@@ -7,6 +7,8 @@ import com.leqiwl.novel.domain.dto.NovelInfoByTypeInDto;
 import com.leqiwl.novel.domain.entify.Novel;
 import com.leqiwl.novel.repository.NovelRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +24,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -39,12 +42,35 @@ public class NovelService {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    @CachePut(cacheNames = "novel#10m", key="#novel.getIdMark()")
-    public Novel save(Novel novel){
-        return this.novelRepository.save(novel);
+    @Resource
+    private RedissonClient redissonClient;
+
+    @CachePut(cacheNames = "novel#2m", key="#novel.getIdMark()")
+    public Novel save(Novel novel) throws InterruptedException {
+        RLock lock = null;
+        try {
+            lock = redissonClient.getLock("novelSave" + novel.getIdMark());
+            lock.tryLock(3,6, TimeUnit.SECONDS);
+            Novel dbNovel = this.novelRepository.getNovelByIdMark(novel.getIdMark());
+            if(null == dbNovel){
+                return this.novelRepository.save(novel);
+            }
+            if(novel.getName().equals(dbNovel.getName()) && novel.getRuleId().equals(dbNovel.getRuleId())){
+                novel.setId(dbNovel.getId());
+                return this.novelRepository.save(novel);
+            }
+        } catch (InterruptedException e) {
+           throw e;
+        }finally {
+            if(null != lock){
+                lock.unlock();
+            }
+        }
+
+        return new Novel();
     }
 
-    @Cacheable(cacheNames = "novel#10m", key = "#idMark")
+    @Cacheable(cacheNames = "novel#2m", key = "#idMark")
     public Novel getByIdMark(String idMark){
         Novel novel = this.novelRepository.getNovelByIdMark(idMark);
         if(null == novel){
@@ -53,7 +79,7 @@ public class NovelService {
         return novel;
     }
 
-    @Cacheable(cacheNames = "novel#10m", key = "#novelId")
+    @Cacheable(cacheNames = "novel#2m", key = "#novelId")
     public Novel getByNovelId(String novelId){
         Novel novel = this.novelRepository.getNovelByNovelId(novelId);
         if(null == novel){

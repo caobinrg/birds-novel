@@ -1,9 +1,10 @@
 package com.leqiwl.novel.job.pip;
 
 import cn.hutool.core.util.StrUtil;
+import com.leqiwl.novel.config.sysconst.RequestConst;
+import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.job.pip.listener.SpiderEventListener;
 import com.leqiwl.novel.job.pip.scheduler.SpiderRedisScheduler;
-import com.leqiwl.novel.remote.SpiderContainerRemote;
 import org.apache.commons.collections.CollectionUtils;
 import org.redisson.api.RCountDownLatch;
 import org.redisson.api.RedissonClient;
@@ -20,7 +21,7 @@ import java.util.List;
  * 添加监听器
  * @author 飞鸟不过江
  */
-public class SpiderStartContainer extends Spider implements SpiderContainerRemote {
+public class SpiderStartContainer extends Spider {
 
     private SpiderEventListener listener;
 
@@ -64,65 +65,56 @@ public class SpiderStartContainer extends Spider implements SpiderContainerRemot
         this.status = 3;
     }
 
-    @Override
     public void spiderClose(String countDownSpace) {
         this.close();
         spiderCountDown(countDownSpace);
     }
 
-    @Override
     public void spiderStop(String countDownSpace){
         this.stop();
         this.status = this.stat.intValue();
         spiderCountDown(countDownSpace);
     }
 
-    @Override
     public void spiderStart(){
         spiderStart(null);
     }
 
 
-    @Override
     public void spiderStart(String countDownSpace){
-        logger.info("===================== check spider status =====================");
+        logger.info("===================== check spider:"+this.getUUID()+" status =====================");
         if(this.getSpiderStatus() == 3){
-            logger.info("===================== spider is close! spider will be restart! =====================");
+            logger.info("===================== spider:"+this.getUUID()+" is close! spider will be restart! =====================");
             this.spiderStop(null);
         }
         while (this.getSpiderStatus() == 3){
-            logger.info("===================== spider is to stop =====================");
+            logger.info("===================== spider:"+this.getUUID()+" is to stop =====================");
         }
-        if(this.stat.intValue() == 2){
+        if(this.stat.intValue() == 2 || this.stat.intValue() == 0){
             this.start();
 
             this.status = this.stat.intValue();
         }
-        logger.info("===================== spider is start =====================");
+        logger.info("===================== spider:"+this.getUUID()+" is start =====================");
         spiderCountDown(countDownSpace);
     }
 
 
-    @Override
-    public void spiderJumpQueue(Request request){
-        spiderJumpQueue(request,null);
-    }
 
-    @Override
-    public void spiderJumpQueue(Request request, String domain){
-        SpiderRedisScheduler scheduler = (SpiderRedisScheduler)this.getScheduler();
-        if(null != scheduler){
-            scheduler.jumpQueue(request,domain);
+    public void spiderJumpQueue(Request request){
+        CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
+        if(null == requestInfo){
+            return;
         }
+        requestInfo.setJump(true);
+        this.addRequest(request);
         spiderStart();
     }
 
-    @Override
     public String getSpiderUUID() {
         return this.getUUID();
     }
 
-    @Override
     public Integer getSpiderStatus(){
         if(status == 3){
             return status;

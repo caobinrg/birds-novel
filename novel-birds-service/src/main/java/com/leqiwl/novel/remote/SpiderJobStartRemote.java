@@ -7,5 +7,5 @@ public interface SpiderJobStartRemote {
 
     void start();
 
-    int getSpiderStatus();
+    int getStarStatus();
 }

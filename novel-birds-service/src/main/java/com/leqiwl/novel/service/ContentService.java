@@ -44,12 +44,10 @@ public class ContentService {
     @Value("${contentError.nameError}")
     private String contentNameError;
 
-    @CachePut(cacheNames = "content#10m", key = "#content.getNovelId()+'-'+#content.getChapterId()")
     public Content save(Content content){
         return contentRepository.save(content);
     }
 
-    @Cacheable(cacheNames = "content#10m", key = "#novelId+'-'+#chapterId")
     public Content getByNovelAndChapterId(String novelId,String chapterId){
         Content content = contentRepository.getContentByNovelIdAndChapterId(novelId, chapterId);
         if(null == content){
