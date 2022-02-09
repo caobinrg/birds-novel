@@ -9,6 +9,9 @@
     description=${contentInfo.name+','+contentInfo.novelName})">
     </head>
 
+
+
+
 </head>
 <body>
     <div id="app" >
@@ -111,136 +114,131 @@
 
 
     </div>
-</body>
-<script th:inline="javascript">
-    const app = Vue.createApp({
-        data: ()=>({
-            show: false,
-            chapterShow:false,
-            currentContentInfo: [[${contentInfo}]],
-            list: [ [[${contentInfo}]] ],
-            loading: false,
-            finished: false,
-            hasLoad:false,
-            error:false,
-            bgChecked: "default",
-            fontSizeValue:16,
-            styleClass:{"default":true,"fontSize16":true},
-            allChapter:[]
-        }),
-        methods:{
-            clickLast:function(){
-                if(this.currentContentInfo.lastChapterUrl == undefined || this.currentContentInfo.lastChapterUrl  == ""){
-                    vant.Toast("没有上一章了")
-                }else{
-                    window.location.replace(this.currentContentInfo.lastChapterUrl);
-                }
+    <script th:inline="javascript">
+        const app = Vue.createApp({
+            data: ()=>({
+                show: false,
+                chapterShow:false,
+                currentContentInfo: [[${contentInfo}]],
+                list: [ [[${contentInfo}]] ],
+                loading: false,
+                finished: false,
+                error:false,
+                bgChecked: "default",
+                fontSizeValue:16,
+                styleClass:{"default":true,"fontSize16":true},
+                allChapter:[]
+            }),
+            methods:{
+                clickLast:function(){
+                    if(this.currentContentInfo.lastChapterUrl == undefined || this.currentContentInfo.lastChapterUrl  == ""){
+                        vant.Toast("没有上一章了")
+                    }else{
+                        window.location.replace(this.currentContentInfo.lastChapterUrl);
+                    }
+                },
+                clickNext:function(){
+                    if(this.currentContentInfo.nextChapterUrl == undefined || this.currentContentInfo.nextChapterUrl  == ""){
+                        vant.Toast("没有下一章了")
+                    }else{
+                        window.location.replace(this.currentContentInfo.nextChapterUrl);
+                    }
+
+                },
+                onLoad:function(){
+                    vant.Toast.loading({
+                        message: '加载中...',
+                        forbidClick: true,
+                        loadingType: 'spinner',
+                    });
+                    if(!this.currentContentInfo.hasDataFlag){
+                        this.loading = false;
+                        return;
+                    }
+                    if(this.currentContentInfo.nextChapterId !== undefined && this.currentContentInfo.nextChapterId !== ""){
+                        var self = this;
+                        $.ajax({
+                            url: '/api/novel/contentInfo',
+                            type: 'post',
+                            data: JSON.stringify({"novelId":self.currentContentInfo.novelId,
+                                "chapterId":self.currentContentInfo.nextChapterId}),
+                            contentType: 'application/json',
+                            async:false,
+                            success:function (res) {
+                                if(res === undefined || res.success === false){
+                                    self.error = true
+                                    return;
+                                }
+                                let contentInfo = res.data
+                                if(contentInfo !== undefined && contentInfo.name !== undefined && contentInfo.name !== "章节错误"){
+                                    self.currentContentInfo =  contentInfo
+                                    self.list.push(contentInfo)
+                                }else{
+                                    self.error = true
+                                }
+                            },
+                            error(err){
+                                self.error = true
+                            }
+                        })
+                    }else{
+                        this.finished = true;
+                    }
+                    this.loading = false;
+                    vant.Toast.clear();
+                },
+                contentClick:function(){
+                    this.show = !this.show
+                },
+                onClickLeft(){
+                    history.back(-1);
+                },
+                onClickHome(){
+                    window.location.replace("/");
+                },
+                styleClassChange(){
+                    this.styleClass = {};
+                    this.styleClass[this.bgChecked] = true;
+                    this.styleClass["fontSize"+this.fontSizeValue] = true;
+                    $('body').attr("class",this.bgChecked)
+                },
+                clickAllChapter(){
+                    vant.Toast.loading({
+                        message: '章节获取中...',
+                        forbidClick: true,
+                        loadingType: 'spinner',
+                    });
+                    if(this.allChapter.length > 0){
+                        vant.Toast.clear();
+                    }
+                    this.chapterShow = true;
+                },
             },
-            clickNext:function(){
-                if(this.currentContentInfo.nextChapterUrl == undefined || this.currentContentInfo.nextChapterUrl  == ""){
-                    vant.Toast("没有下一章了")
-                }else{
-                    window.location.replace(this.currentContentInfo.nextChapterUrl);
-                }
+            beforeCreate:function(){
 
             },
-            onLoad:function(){
-                if(this.hasLoad){
-                    return;
-                }
-                this.hasLoad = true;
-                // vant.Toast.loading({
-                //     message: '加载中...',
-                //     forbidClick: true,
-                //     loadingType: 'spinner',
-                // });
-                if(!this.currentContentInfo.hasDataFlag){
-                    this.loading = false;
-                    this.hasLoad = false;
-                    return;
-                }
-                if(this.currentContentInfo.nextChapterId !== undefined && this.currentContentInfo.nextChapterId !== ""){
-                    var self = this;
-                    $.ajax({
-                        url: '/api/novel/contentInfo',
-                        type: 'post',
-                        data: JSON.stringify({"novelId":self.currentContentInfo.novelId,
-                            "chapterId":self.currentContentInfo.nextChapterId}),
-                        contentType: 'application/json',
-                        async:false,
-                        success:function (res) {
-                            if(res === undefined || res.success === false){
-                                self.error = true
-                                this.hasLoad = false;
-                                return;
-                            }
-                            let contentInfo = res.data
-                            if(contentInfo !== undefined && contentInfo.name !== undefined && contentInfo.name !== "章节错误"){
-                                self.currentContentInfo =  contentInfo
-                                self.list.push(contentInfo)
-                            }else{
-                                self.error = true
-                                this.hasLoad = false;
-                            }
-                        },
-                        error(err){
-                            self.error = true
-                            this.hasLoad = false;
-                        }
-                    })
-                }else{
-                    this.finished = true;
-                }
-                this.hasLoad = false;
-                this.loading = false;
-            },
-            contentClick:function(){
-              this.show = !this.show
-            },
-            onClickLeft(){
-                history.back(-1);
-            },
-            onClickHome(){
-                window.location.replace("/");
-            },
-            styleClassChange(){
-                this.styleClass = {};
-                this.styleClass[this.bgChecked] = true;
-                this.styleClass["fontSize"+this.fontSizeValue] = true;
-                $('body').attr("class",this.bgChecked)
-            },
-            clickAllChapter(){
-                vant.Toast.loading({
-                    message: '章节获取中...',
-                    forbidClick: true,
-                    loadingType: 'spinner',
-                });
-                if(this.allChapter.length > 0){
+            created:function () {
+                $('body').attr("class",this.bgChecked);
+                var self = this;
+                $.ajax({
+                    url: '/api/novel/getChapter',
+                    type: 'post',
+                    data: JSON.stringify({"novelId": self.currentContentInfo.novelId}),
+                    contentType: 'application/json',
+                    async:false,
+                }).then(function (res) {
+                    if(res!=undefined && res.success == true){
+                        self.allChapter =  res.data
+                    }
                     vant.Toast.clear();
-                }
-                this.chapterShow = true;
-            },
-        },
-        created:function () {
-            $('body').attr("class",this.bgChecked);
-            var self = this;
-            $.ajax({
-                url: '/api/novel/getChapter',
-                type: 'post',
-                data: JSON.stringify({"novelId": self.currentContentInfo.novelId}),
-                contentType: 'application/json',
-                async:false,
-            }).then(function (res) {
-                if(res!=undefined && res.success == true){
-                    self.allChapter =  res.data
-                }
-                vant.Toast.clear();
-            }).fail(function () {
-                vant.Toast.clear();
-            });
-        }
-    }).use(vant).mount("#app")
-</script>
+                }).fail(function () {
+                    vant.Toast.clear();
+                });
+            }
+        }).use(vant).mount("#app")
+    </script>
+</body>
+
 
 <style scoped>
 
