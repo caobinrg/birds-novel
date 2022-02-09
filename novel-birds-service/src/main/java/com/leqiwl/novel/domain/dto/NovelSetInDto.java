@@ -1,6 +1,5 @@
 package com.leqiwl.novel.domain.dto;
 
-import com.leqiwl.novel.Test111;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -13,7 +12,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class NovelSetInDto {
 
-    @Test111
     @NotBlank(message = "novelId不能为空")
     private String novelId;
 

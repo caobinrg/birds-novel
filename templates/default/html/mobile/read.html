@@ -210,39 +210,34 @@
                 $('body').attr("class",this.bgChecked)
             },
             clickAllChapter(){
-                if(this.allChapter.length > 0){
-                    this.chapterShow = true;
-                    return;
-                }
                 vant.Toast.loading({
                     message: '章节获取中...',
                     forbidClick: true,
                     loadingType: 'spinner',
                 });
-                if(this.currentContentInfo.novelId == undefined && this.currentContentInfo.novelId == ""){
+                if(this.allChapter.length > 0){
                     vant.Toast.clear();
-                    return;
                 }
-                var self = this;
-                $.ajax({
-                    url: '/api/novel/getChapter',
-                    type: 'post',
-                    data: JSON.stringify({"novelId": self.currentContentInfo.novelId}),
-                    contentType: 'application/json',
-                    async:false,
-                }).then(function (res) {
-                    if(res!=undefined && res.success == true){
-                        self.allChapter =  res.data
-                    }
-                    vant.Toast.clear();
-                }).fail(function () {
-                    vant.Toast.clear();
-                });
                 this.chapterShow = true;
             },
         },
         created:function () {
-            $('body').attr("class",this.bgChecked)
+            $('body').attr("class",this.bgChecked);
+            var self = this;
+            $.ajax({
+                url: '/api/novel/getChapter',
+                type: 'post',
+                data: JSON.stringify({"novelId": self.currentContentInfo.novelId}),
+                contentType: 'application/json',
+                async:false,
+            }).then(function (res) {
+                if(res!=undefined && res.success == true){
+                    self.allChapter =  res.data
+                }
+                vant.Toast.clear();
+            }).fail(function () {
+                vant.Toast.clear();
+            });
         }
     }).use(vant).mount("#app")
 </script>

@@ -151,13 +151,21 @@
                 if(res!=undefined && res.success == true){
                     self.allChapter =  res.data
                 }
-                // vant.Toast.clear();
+                vant.Toast.clear();
             }).fail(function () {
-                // vant.Toast.clear();
+                vant.Toast.clear();
             });
         },
         methods:{
             clickAllChapter(){
+                vant.Toast.loading({
+                    message: '章节获取中...',
+                    forbidClick: true,
+                    loadingType: 'spinner',
+                });
+                if(this.allChapter.length > 0){
+                    vant.Toast.clear();
+                }
                 this.show = true;
             },
             onClickLeft(){

@@ -55,10 +55,12 @@ public class NovelService {
             if(null == dbNovel){
                 return this.novelRepository.save(novel);
             }
-            if(novel.getName().equals(dbNovel.getName()) && novel.getRuleId().equals(dbNovel.getRuleId())){
+            if(novel.getNovelId().equals(dbNovel.getNovelId())){
                 novel.setId(dbNovel.getId());
                 return this.novelRepository.save(novel);
             }
+            //idMark 冲突，忽略改书
+           return dbNovel;
         } catch (InterruptedException e) {
            throw e;
         }finally {
@@ -66,8 +68,6 @@ public class NovelService {
                 lock.unlock();
             }
         }
-
-        return new Novel();
     }
 
     @Cacheable(cacheNames = "novel#2m", key = "#idMark")
@@ -79,7 +79,7 @@ public class NovelService {
         return novel;
     }
 
-    @Cacheable(cacheNames = "novel#2m", key = "#novelId")
+    @Cacheable(cacheNames = "novelById#2m", key = "#novelId")
     public Novel getByNovelId(String novelId){
         Novel novel = this.novelRepository.getNovelByNovelId(novelId);
         if(null == novel){
