@@ -111,7 +111,11 @@ public class NovelInfoProcessor implements NovelProcessor{
         String lastUpdateMark = html.xpath(detailRule.getLastUpdateMarkRule()).toString();
         Date now = new Date();
         //最新章节
-        List<Chapter> novelChapters = CollectionUtil.reverseNew(chapterList).subList(0, 5);
+        int infoChapterSize = 5;
+        if(chapterList.size()<=5){
+            infoChapterSize = chapterList.size();
+        }
+        List<Chapter> novelChapters = CollectionUtil.reverseNew(chapterList).subList(0, infoChapterSize);
         //字数
         String wordNum = "0";
         if(StrUtil.isNotBlank(detailRule.getWordNumRule())){
