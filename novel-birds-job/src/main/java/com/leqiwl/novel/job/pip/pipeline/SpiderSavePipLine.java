@@ -87,14 +87,18 @@ public class SpiderSavePipLine implements Pipeline {
     }
 
     private void saveChapter(ResultItems resultItems, String novelId, boolean novelIdClash) {
+        if(novelIdClash){
+            //id冲突，不保存章节数据
+           return;
+        }
         List<Object> chapterInfo = resultItems.get(CrawlerSaveTypeEnum.CHAPTER.getType().toString());
         if(CollectionUtil.isNotEmpty(chapterInfo)){
             List<Chapter> collect = chapterInfo.stream().map(item -> (Chapter) item).collect(Collectors.toList());
-            if(novelIdClash){
-                for (Chapter chapter : collect) {
-                    chapter.setNovelId(novelId);
-                }
-            }
+//            if(novelIdClash){
+//                for (Chapter chapter : collect) {
+//                    chapter.setNovelId(novelId);
+//                }
+//            }
             if(CollectionUtil.isNotEmpty(collect)){
                 long saveStart = System.currentTimeMillis();
                 chapterService.save(collect,novelId);
