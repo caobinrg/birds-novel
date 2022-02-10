@@ -67,6 +67,7 @@ public class SpiderStartContainerFactory {
         spiderStartContainer.setPipelines(Collections.singletonList(spiderSavePipLine));
         spiderStartContainer.thread(executorService,
                 threadNum <= 0 ? (Runtime.getRuntime().availableProcessors() * 2) : threadNum);
+        spiderStartContainer.setExitWhenComplete(false);
         startContainerMap.put(domain,spiderStartContainer);
         return spiderStartContainer;
     }
