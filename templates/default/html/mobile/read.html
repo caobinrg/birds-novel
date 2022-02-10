@@ -146,15 +146,15 @@
 
                 },
                 onLoad:function(){
+                    if(!this.currentContentInfo.hasDataFlag){
+                        this.loading = false;
+                        return;
+                    }
                     vant.Toast.loading({
                         message: '加载中...',
                         forbidClick: true,
                         loadingType: 'spinner',
                     });
-                    if(!this.currentContentInfo.hasDataFlag){
-                        this.loading = false;
-                        return;
-                    }
                     if(this.currentContentInfo.nextChapterId !== undefined && this.currentContentInfo.nextChapterId !== ""){
                         var self = this;
                         $.ajax({
