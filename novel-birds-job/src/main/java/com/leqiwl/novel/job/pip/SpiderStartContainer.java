@@ -102,6 +102,7 @@ public class SpiderStartContainer extends Spider {
 
 
     public void spiderJumpQueue(Request request){
+        logger.info("收到插队采集请求,url:{}",request.getUrl());
         CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
         if(null == requestInfo){
             return;
