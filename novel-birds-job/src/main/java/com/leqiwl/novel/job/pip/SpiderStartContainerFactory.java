@@ -65,7 +65,8 @@ public class SpiderStartContainerFactory {
         spiderStartContainer.setDownloader(spiderDownloader);
         spiderStartContainer.setScheduler(spiderRedisScheduler);
         spiderStartContainer.setPipelines(Collections.singletonList(spiderSavePipLine));
-        spiderStartContainer.setExecutorService(executorService);
+        spiderStartContainer.thread(executorService,
+                threadNum <= 0 ? (Runtime.getRuntime().availableProcessors() * 2) : threadNum);
         startContainerMap.put(domain,spiderStartContainer);
         return spiderStartContainer;
     }
