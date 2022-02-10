@@ -204,6 +204,7 @@ public class SpiderSavePipLine implements Pipeline {
                     long saveStart = System.currentTimeMillis();
                     novel = novelService.save(novel);
                     if(!novelId.equals(novel.getNovelId())){
+                        log.info("持久化novel---novel:{},id冲突，持久化失败",novel.getNovelId());
                         novelIdClash = true;
                     }
                     novelId = novel.getNovelId();
