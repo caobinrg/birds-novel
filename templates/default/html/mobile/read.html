@@ -8,13 +8,18 @@
     keywords=${contentInfo.name+','+contentInfo.novelName},
     description=${contentInfo.name+','+contentInfo.novelName})">
     </head>
+    <style scoped>
 
+        [v-cloak]{
+            display: none;
+        }
+    </style>
 
 
 
 </head>
 <body>
-    <div id="app" >
+    <div id="app" v-cloak>
         <div :class="styleClass">
             <van-list
                     v-model:loading="loading"
@@ -231,7 +236,6 @@
                     type: 'post',
                     data: JSON.stringify({"novelId": self.currentContentInfo.novelId}),
                     contentType: 'application/json',
-                    async:false,
                 }).then(function (res) {
                     if(res!=undefined && res.success == true){
                         self.allChapter =  res.data

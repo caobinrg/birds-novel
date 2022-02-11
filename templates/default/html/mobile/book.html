@@ -9,10 +9,15 @@
     ${novel.description})">
         <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
     </head>
+    <style scoped>
 
+        [v-cloak]{
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-cloak>
     <van-nav-bar :title="novel.name" left-text="返回" left-arrow @click-left="onClickLeft">
     </van-nav-bar>
     <van-skeleton title avatar :row="3" :loading="false">
