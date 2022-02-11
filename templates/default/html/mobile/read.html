@@ -50,10 +50,13 @@
                          :style="{'min-height':(index == 0 ? '70vh':'10vh')}"
                          :class="styleClass"
                     >
-
                     </div>
-                    <van-divider>本章完</van-divider>
+
                 </div>
+<!--                <div style="text-align: center" v-show="onload">-->
+<!--                    <van-loading color="#494c49" />-->
+<!--                </div>-->
+
             </van-list>
 
 <!--            设置部分开始-->
@@ -122,6 +125,7 @@
                 currentContentInfo: [[${contentInfo}]],
                 list: [ [[${contentInfo}]] ],
                 loading: false,
+                ajaxLoading: false,
                 finished: false,
                 error:false,
                 bgChecked: "default",
@@ -150,20 +154,18 @@
                         this.loading = false;
                         return;
                     }
-                    vant.Toast.loading({
-                        message: '加载中...',
-                        forbidClick: true,
-                        loadingType: 'spinner',
-                    });
+                    if(this.ajaxLoading){
+                        return;
+                    }
                     if(this.currentContentInfo.nextChapterId !== undefined && this.currentContentInfo.nextChapterId !== ""){
                         var self = this;
+                        self.ajaxLoading = true;
                         $.ajax({
                             url: '/api/novel/contentInfo',
                             type: 'post',
                             data: JSON.stringify({"novelId":self.currentContentInfo.novelId,
                                 "chapterId":self.currentContentInfo.nextChapterId}),
                             contentType: 'application/json',
-                            async:false,
                             success:function (res) {
                                 if(res === undefined || res.success === false){
                                     self.error = true
@@ -176,16 +178,18 @@
                                 }else{
                                     self.error = true
                                 }
+                                self.ajaxLoading = false;
+                                self.loading = false;
                             },
                             error(err){
                                 self.error = true
+                                self.ajaxLoading = false;
+                                self.loading = false;
                             }
                         })
                     }else{
                         this.finished = true;
                     }
-                    this.loading = false;
-                    vant.Toast.clear();
                 },
                 contentClick:function(){
                     this.show = !this.show
@@ -213,6 +217,8 @@
                     }
                     this.chapterShow = true;
                 },
+
+
             },
             beforeCreate:function(){
 
