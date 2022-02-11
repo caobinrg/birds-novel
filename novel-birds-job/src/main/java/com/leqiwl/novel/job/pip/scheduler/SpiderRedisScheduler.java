@@ -164,7 +164,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     private Request pollWithStatus(RDeque<Object> deque,boolean isJump){
         while (true){
-            Request request = (Request)deque.pollLast();
+            Request request = (Request)deque.pollFirst();
             if(request == null) {
                 return null;
             }
