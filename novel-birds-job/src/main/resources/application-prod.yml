@@ -5,7 +5,7 @@ spring:
 spider:
   # 0:cpu*2 线程数启动
   threadNum: 3
-  retryTimes: 3000
+  retryTimes: 5
   sleepTime: 3000
   timeOut: 60000
   queueNum: 500

@@ -61,14 +61,15 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     private RMap<String,String> queueMap;
 
-    private RLongAdder queueLeftTotal;
+    private RAtomicLong queueLeftTotal;
 
     @PostConstruct
     public void post(){
-        queueLeftTotal = redissonClient.getLongAdder("queueLeftTotal");
+        queueLeftTotal = redissonClient.getAtomicLong("queueLeftTotal");
+        queueLeftTotal.set(0L);
         queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
         for (String key : queueMap.keySet()) {
-            queueLeftTotal.add(redissonClient.getDeque(key).size());
+            queueLeftTotal.addAndGet(redissonClient.getDeque(key).size());
         }
     }
 
@@ -132,11 +133,11 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         String queueKey = getQueueKey(task, jump,type);
         RDeque<Object> deque = redissonClient.getDeque(queueKey);
         queueMap.computeIfAbsent(queueKey,key -> {
-            queueLeftTotal.add(deque.size());
+            queueLeftTotal.addAndGet(deque.size());
             return "1";
         });
         deque.addLast(request);
-        queueLeftTotal.increment();
+        queueLeftTotal.incrementAndGet();
     }
 
     @Override
@@ -148,7 +149,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             return request;
         }
         long limit = spiderConfig.getQueueNum() * 1000;
-        long total = queueLeftTotal.sum();
+        long total = queueLeftTotal.get();
         log.info("队列数据数量：{}",total);
         if(total < limit){
             RDeque<Object> infoDeque = redissonClient.getDeque(getQueueKey(task,false,null));
@@ -167,7 +168,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             if(request == null) {
                 return null;
             }
-            queueLeftTotal.decrement();
+            queueLeftTotal.decrementAndGet();
             CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
             if(null == requestInfo){
                 return null;
@@ -188,7 +189,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public int getLeftRequestsCount(Task task) {
-        return (int)queueLeftTotal.sum();
+        return (int)queueLeftTotal.get();
     }
 
     public int getLeftRequestsCount(String domain){
