@@ -68,8 +68,8 @@ public class BirdsTaskTest {
 
     @Autowired
     private RedisTemplate redisTemplate;
-    @Test
-    public void removeAllRequest(){
-        spiderRedisScheduler.delAllRequest("www.xbiquge.la");
-    }
+//    @Test
+//    public void removeAllRequest(){
+//        spiderRedisScheduler.delAllRequest("www.xbiquge.la");
+//    }
 }

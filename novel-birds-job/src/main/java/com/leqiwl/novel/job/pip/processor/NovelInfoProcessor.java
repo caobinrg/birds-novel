@@ -77,7 +77,10 @@ public class NovelInfoProcessor implements NovelProcessor{
                 return;
             }
         }
-        novel = getNovelInfo(page,requestInfo,crawlerInfo,html,null);
+        if(null == novel || null == novel.getId()){
+            novel = null;
+        }
+        novel = getNovelInfo(page,requestInfo,crawlerInfo,html,novel);
         //书籍信息持久化
         page.putField(CrawlerSaveTypeEnum.DETAIL.getType().toString(), novel);
     }

@@ -8,3 +8,4 @@ spider:
   retryTimes: 3000
   sleepTime: 3000
   timeOut: 60000
+  queueNum: 500

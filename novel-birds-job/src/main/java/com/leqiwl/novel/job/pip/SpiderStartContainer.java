@@ -134,7 +134,7 @@ public class SpiderStartContainer extends Spider {
     public int getTotalRequestsCount(String domain){
         SpiderRedisScheduler scheduler = (SpiderRedisScheduler)this.getScheduler();
         if(null != scheduler){
-            return scheduler.getTotalRequestsCount(domain);
+            return scheduler.getTotalRequestsCountByDomain(domain);
         }
         return 0;
     }

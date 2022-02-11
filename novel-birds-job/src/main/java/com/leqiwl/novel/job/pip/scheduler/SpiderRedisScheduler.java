@@ -1,22 +1,17 @@
 package com.leqiwl.novel.job.pip.scheduler;
 
-import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.leqiwl.novel.config.sysconst.RedisKeyConst;
 import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerRule;
 import com.leqiwl.novel.enums.CrawlerTypeEnum;
+import com.leqiwl.novel.job.config.SpiderConfig;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RDeque;
-import org.redisson.api.RSet;
-import org.redisson.api.RSetCache;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.redisson.api.*;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
@@ -24,8 +19,8 @@ import us.codecraft.webmagic.scheduler.DuplicateRemovedScheduler;
 import us.codecraft.webmagic.scheduler.MonitorableScheduler;
 import us.codecraft.webmagic.scheduler.component.DuplicateRemover;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义调度器，将下载器传递过来的请求保存到redis中，进行url去重，弹出请求
@@ -37,10 +32,14 @@ import java.util.concurrent.TimeUnit;
 public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements MonitorableScheduler, DuplicateRemover {
 
     /**
-     * 用于存放url的队列
+     * 用于存放url的队列(info)
      */
-    private static final String QUEUE_PREFIX = "queue_";
+    private static final String QUEUE_INFO_PREFIX = "queue_info_";
 
+    /**
+     * 用于存放url的队列(content)
+     */
+    private static final String QUEUE_CONTENT_PREFIX = "queue_content_";
     /**
      * 用于存放插队url的队列
      */
@@ -53,16 +52,40 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Resource
     private CrawlerRuleService crawlerRuleService;
 
-    @Autowired
+    @Resource
     private RedissonClient redissonClient;
+
+    @Resource
+    private SpiderConfig spiderConfig;
+
+
+    private RMap<String,String> queueMap;
+
+    private RLongAdder queueLeftTotal;
+
+    @PostConstruct
+    public void post(){
+        queueLeftTotal = redissonClient.getLongAdder("queueLeftTotal");
+        queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
+        for (String key : queueMap.keySet()) {
+            queueLeftTotal.add(redissonClient.getDeque(key).size());
+        }
+    }
 
 
     protected String getSetKey(Task task) {
         return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, task.getUUID());
     }
 
-    protected String getQueueKey(Task task,boolean isJump) {
-        return StringUtils.join( RedisKeyConst.spiderKeySpace, (isJump?QUEUE_JUMP:QUEUE_PREFIX), task.getUUID());
+    protected String getQueueKey(Task task,boolean isJump, Integer type) {
+        if(isJump){
+            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_JUMP, task.getUUID());
+        }
+        if(!CrawlerTypeEnum.CONTENT.getType().equals(type)){
+            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_INFO_PREFIX, task.getUUID());
+        }
+        return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_CONTENT_PREFIX, task.getUUID());
+
     }
 
     @Override
@@ -82,13 +105,19 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     public boolean isDuplicate(Request request, Task task) {
         RSetCache<Object> urlSet = redissonClient.getSetCache(getSetKey(task));
         boolean has = urlSet.contains(request.getUrl());
-        if(Boolean.FALSE.equals(has)) {
-            // 将url加入到redis set中
-            urlSet.add(request.getUrl(),60, TimeUnit.MINUTES);
+        if(!has){
+            urlSet.add(request.getUrl());
             return false;
-        } else {
-            return true;
         }
+        CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
+        if(null != requestInfo){
+            boolean jump = requestInfo.isJump();
+            //插队
+            if(jump){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -98,34 +127,47 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             return;
         }
         boolean jump = requestInfo.isJump();
-        // 将request推入redis队列中
-        RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,jump));
         Integer type = requestInfo.getType();
-        if(CrawlerTypeEnum.CONTENT.getType().equals(type)){
-            deque.addLast(request);
-            return;
-        }
-        deque.addFirst(request);
+        // 将request推入redis队列中
+        String queueKey = getQueueKey(task, jump,type);
+        RDeque<Object> deque = redissonClient.getDeque(queueKey);
+        queueMap.computeIfAbsent(queueKey,key -> {
+            queueLeftTotal.add(deque.size());
+            return "1";
+        });
+        deque.addLast(request);
+        queueLeftTotal.increment();
     }
 
     @Override
     public Request poll(Task task) {
         // 从队列中弹出一个url
-        RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(task, true));
-        Request request = pollWithStatus(jumpDeque);
+        RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(task, true,null));
+        Request request = pollWithStatus(jumpDeque,true);
         if(null != request){
             return request;
         }
-        RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false));
-        return pollWithStatus(deque);
+        long limit = spiderConfig.getQueueNum() * 1000;
+        long total = queueLeftTotal.sum();
+        log.info("队列数据数量：{}",total);
+        if(total < limit){
+            RDeque<Object> infoDeque = redissonClient.getDeque(getQueueKey(task,false,null));
+            request = pollWithStatus(infoDeque,false);
+            if(null != request){
+                return request;
+            }
+        }
+        RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
+        return pollWithStatus(deque,false);
     }
 
-    private Request pollWithStatus(RDeque<Object> deque){
+    private Request pollWithStatus(RDeque<Object> deque,boolean isJump){
         while (true){
-            Request request = (Request)deque.pollFirst();
+            Request request = (Request)deque.pollLast();
             if(request == null) {
                 return null;
             }
+            queueLeftTotal.decrement();
             CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
             if(null == requestInfo){
                 return null;
@@ -146,17 +188,17 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public int getLeftRequestsCount(Task task) {
-        RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(task,true));
-        RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false));
-        return jumpDeque.size() + deque.size();
+        return (int)queueLeftTotal.sum();
     }
 
     public int getLeftRequestsCount(String domain){
         if(StrUtil.isBlank(domain)){
             return 0;
         }
-        RDeque<Object> deque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_PREFIX + domain);
-        return deque.size();
+        RDeque<Object> jumpDeque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_JUMP + domain);
+        RDeque<Object> infoDeque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_INFO_PREFIX + domain);
+        RDeque<Object> contentDeque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_CONTENT_PREFIX + domain);
+        return jumpDeque.size() + infoDeque.size() + contentDeque.size();
     }
 
 
@@ -166,19 +208,11 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         return urlSet.size();
     }
 
-    public int getTotalRequestsCount(String domain) {
+    public int getTotalRequestsCountByDomain(String domain) {
         if(StrUtil.isBlank(domain)){
             return 0;
         }
         RSetCache<Object> urlSet = redissonClient.getSetCache(RedisKeyConst.spiderKeySpace + SET_PREFIX + domain);
         return urlSet.size();
-    }
-
-
-    public void delAllRequest(String domain){
-        RDeque<Object> deque = redissonClient.getDeque(RedisKeyConst.spiderKeySpace + QUEUE_PREFIX + domain);
-        deque.delete();
-        RSetCache<Object> urlSet = redissonClient.getSetCache(RedisKeyConst.spiderKeySpace + SET_PREFIX + domain);
-        urlSet.delete();
     }
 }
