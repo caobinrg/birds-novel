@@ -145,21 +145,26 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         // 从队列中弹出一个url
         RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(task, true,null));
         Request request = pollWithStatus(jumpDeque,true);
+        long total = queueLeftTotal.get();
         if(null != request){
+            log.info("弹出request:{},队列数据数量：{}",request.getUrl(),total);
             return request;
         }
         long limit = spiderConfig.getQueueNum() * 1000;
-        long total = queueLeftTotal.get();
-        log.info("队列数据数量：{}",total);
         if(total < limit){
             RDeque<Object> infoDeque = redissonClient.getDeque(getQueueKey(task,false,null));
             request = pollWithStatus(infoDeque,false);
+            total = queueLeftTotal.get();
             if(null != request){
+                log.info("弹出request:{},队列数据数量：{}",request.getUrl(),total);
                 return request;
             }
         }
         RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
-        return pollWithStatus(deque,false);
+        total = queueLeftTotal.get();
+        request = pollWithStatus(deque, false);
+        log.info("弹出request:{},队列数据数量：{}",request == null ? "" : request.getUrl(),total);
+        return request;
     }
 
     private Request pollWithStatus(RDeque<Object> deque,boolean isJump){
