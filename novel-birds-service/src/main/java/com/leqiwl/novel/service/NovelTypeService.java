@@ -67,7 +67,6 @@ public class NovelTypeService {
     }
 
     private Map<String,String> getTypeMap(List<NovelType> novelTypes){
-        novelTypes = novelTypeRepository.findAll();
         Map<String, String> result = new HashMap<>();
         for (NovelType novelType : novelTypes) {
             String type = novelType.getType();
