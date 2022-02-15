@@ -161,8 +161,8 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             }
         }
         RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
-        total = queueLeftTotal.get();
         request = pollWithStatus(deque, false);
+        total = queueLeftTotal.get();
         log.info("弹出request:{},队列数据数量：{}",request == null ? "" : request.getUrl(),total);
         return request;
     }
@@ -170,17 +170,17 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     private Request pollWithStatus(RDeque<Object> deque,boolean isJump){
         while (true){
             Request request = (Request)deque.pollFirst();
-            if(request == null) {
+            if(deque.isEmpty()){
                 return null;
             }
             queueLeftTotal.decrementAndGet();
             CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
             if(null == requestInfo){
-                return null;
+                continue;
             }
             CrawlerRule crawlerInfo = crawlerRuleService.getByRuleId(requestInfo.getRuleId());
             if(null == crawlerInfo){
-                return null;
+                continue;
             }
             int openStatus = crawlerInfo.getOpenStatus();
             if(openStatus == 0){
