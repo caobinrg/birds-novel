@@ -82,20 +82,24 @@ public class SpiderStartContainer extends Spider {
 
 
     public void spiderStart(String countDownSpace){
-        logger.info("===================== check spider:"+this.getUUID()+" status =====================");
+        logger.info("===================== check spider:{} status:{} ====================="
+                ,this.getUUID(),this.getSpiderStatus());
         if(this.getSpiderStatus() == 3){
-            logger.info("===================== spider:"+this.getUUID()+" is close! spider will be restart! =====================");
+            logger.info("===================== spider:{} is close! status:{} spider will be restart! ====================="
+                    ,this.getUUID(),this.getSpiderStatus());
             this.spiderStop(null);
         }
         while (this.getSpiderStatus() == 3){
-            logger.info("===================== spider:"+this.getUUID()+" is to stop =====================");
+            logger.info("===================== spider:{}，status:{} is to stop ====================="
+                    ,this.getUUID(),this.getSpiderStatus());
         }
         if(this.stat.intValue() == 2 || this.stat.intValue() == 0){
             this.start();
 
             this.status = this.stat.intValue();
         }
-        logger.info("===================== spider:"+this.getUUID()+" is start =====================");
+        logger.info("===================== spider:{},status:{} is start ====================="
+                ,this.getUUID(),this.getSpiderStatus());
         spiderCountDown(countDownSpace);
     }
 
@@ -109,7 +113,7 @@ public class SpiderStartContainer extends Spider {
         }
         requestInfo.setJump(true);
         this.addRequest(request);
-        spiderStart();
+//        spiderStart();
     }
 
     public String getSpiderUUID() {
