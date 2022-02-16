@@ -61,15 +61,15 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     private RMap<String,String> queueMap;
 
-    private RAtomicLong queueLeftTotal;
+    private RLongAdder queueLeftTotal;
 
     @PostConstruct
     public void post(){
-        queueLeftTotal = redissonClient.getAtomicLong("queueLeftTotal");
-        queueLeftTotal.set(0L);
+        queueLeftTotal = redissonClient.getLongAdder("queueLeftTotal");
+        queueLeftTotal.reset();
         queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
         for (String key : queueMap.keySet()) {
-            queueLeftTotal.addAndGet(redissonClient.getDeque(key).size());
+            queueLeftTotal.add(redissonClient.getDeque(key).size());
         }
     }
 
@@ -133,49 +133,51 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         String queueKey = getQueueKey(task, jump,type);
         RDeque<Object> deque = redissonClient.getDeque(queueKey);
         queueMap.computeIfAbsent(queueKey,key -> {
-            queueLeftTotal.addAndGet(deque.size());
+            queueLeftTotal.add(deque.size());
             return "1";
         });
         deque.addLast(request);
-        queueLeftTotal.incrementAndGet();
+        queueLeftTotal.increment();
     }
 
     @Override
     public Request poll(Task task) {
         // 从队列中弹出一个url
-        RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(task, true,null));
-        Request request = pollWithStatus(jumpDeque,true);
-        long total = queueLeftTotal.get();
-        if(null != request){
-            log.info("弹出 jump request:{},队列数据数量：{}",request.getUrl(),total);
-            return request;
+        Request jumpRequest = poll(getQueueKey(task, true, null));
+        if(null != jumpRequest){
+            return jumpRequest;
         }
+        long total = queueLeftTotal.sum();
         long limit = spiderConfig.getQueueNum() * 1000;
         if(total < limit){
-            RDeque<Object> infoDeque = redissonClient.getDeque(getQueueKey(task,false,null));
-            request = pollWithStatus(infoDeque,false);
-            total = queueLeftTotal.get();
-            if(null != request){
-                log.info("弹出 info request:{},队列数据数量：{}",request.getUrl(),total);
-                return request;
+            Request infoRequest = poll(getQueueKey(task, false, null));
+            if(null != infoRequest){
+                return infoRequest;
             }
         }
-        RDeque<Object> deque = redissonClient.getDeque(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
-        request = pollWithStatus(deque, false);
-        total = queueLeftTotal.get();
-        log.info("弹出 content request:{},队列数据数量：{}",request == null ? "" : request.getUrl(),total);
+        return poll(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
+    }
+
+    private Request poll(String queueKey){
+        RDeque<Object> deque = redissonClient.getDeque(queueKey);
+        Request request = pollWithStatus(deque);
+        long total = queueLeftTotal.sum();
+        log.info("queueKey: {} ,弹出 request:{} ,当前队列数据数量：{} , 队列数据总数量：{}",
+                queueKey,request == null ? "" : request.getUrl(),deque.size(),total);
         return request;
     }
 
-    private Request pollWithStatus(RDeque<Object> deque,boolean isJump){
+
+    private Request pollWithStatus(RDeque<Object> deque){
         while (true){
-            Request request = (Request)deque.pollFirst();
-            int size = deque.size();
-            log.info("deque size:{}",size);
-            if(size == 0){
+            if(deque.isEmpty()){
                 return null;
             }
-            queueLeftTotal.decrementAndGet();
+            Request request = (Request)deque.pollFirst();
+            queueLeftTotal.decrement();
+            if(null == request){
+                continue;
+            }
             CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
             if(null == requestInfo){
                 continue;
@@ -196,7 +198,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public int getLeftRequestsCount(Task task) {
-        return (int)queueLeftTotal.get();
+        return (int)queueLeftTotal.sum();
     }
 
     public int getLeftRequestsCount(String domain){
