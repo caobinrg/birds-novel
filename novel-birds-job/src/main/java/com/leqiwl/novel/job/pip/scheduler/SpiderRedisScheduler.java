@@ -66,10 +66,12 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @PostConstruct
     public void post(){
         queueLeftTotal = redissonClient.getLongAdder("queueLeftTotal");
-        queueLeftTotal.reset();
-        queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
-        for (String key : queueMap.keySet()) {
-            queueLeftTotal.add(redissonClient.getDeque(key).size());
+        long sum = queueLeftTotal.sum();
+        if(sum == 0){
+            queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
+            for (String key : queueMap.keySet()) {
+                queueLeftTotal.add(redissonClient.getDeque(key).size());
+            }
         }
     }
 
