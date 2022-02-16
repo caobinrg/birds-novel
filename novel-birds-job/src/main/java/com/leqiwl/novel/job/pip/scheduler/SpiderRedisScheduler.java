@@ -49,6 +49,10 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
      */
     private static final String SET_PREFIX = "set_";
 
+    private static final String QUEUE_SET = "queueSet";
+
+    private static final String QUEUE_TOTAL = "queueLeftTotalAtomic";
+
     @Resource
     private CrawlerRuleService crawlerRuleService;
 
@@ -58,23 +62,17 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Resource
     private SpiderConfig spiderConfig;
 
-
-    private RMap<String,String> queueMap;
-
-    private RLongAdder queueLeftTotal;
-
     @PostConstruct
     public void post(){
-        queueLeftTotal = redissonClient.getLongAdder("queueLeftTotal");
-        long sum = queueLeftTotal.sum();
-        if(sum == 0){
-            queueMap = redissonClient.getMap(RedisKeyConst.spiderKeySpace+"queueMap");
-            for (String key : queueMap.keySet()) {
-                queueLeftTotal.add(redissonClient.getDeque(key).size());
+        RAtomicLong queueLeftTotal = getQueueLeftTotal();
+        if(queueLeftTotal.get() == 0){
+            RSet<String> queueSet = getQueueSet();
+            for (String key : queueSet) {
+                queueLeftTotal.addAndGet(redissonClient.getDeque(key).size());
             }
+            log.info("SpiderRedisScheduler queueLeftTotal init , total:{}",queueLeftTotal.get());
         }
     }
-
 
     protected String getSetKey(Task task) {
         return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, task.getUUID());
@@ -133,13 +131,24 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         Integer type = requestInfo.getType();
         // 将request推入redis队列中
         String queueKey = getQueueKey(task, jump,type);
-        RDeque<Object> deque = redissonClient.getDeque(queueKey);
-        queueMap.computeIfAbsent(queueKey,key -> {
-            queueLeftTotal.add(deque.size());
-            return "1";
-        });
-        deque.addLast(request);
-        queueLeftTotal.increment();
+        RLock lock = null;
+        try {
+            lock = redissonClient.getLock(QUEUE_SET);
+            lock.lock();
+            RDeque<Object> deque = redissonClient.getDeque(queueKey);
+            RSet<String> queueSet = getQueueSet();
+            RAtomicLong queueLeftTotal = getQueueLeftTotal();
+            if(!queueSet.contains(queueKey)){
+                queueLeftTotal.addAndGet(deque.size());
+                queueSet.add(queueKey);
+            }
+            deque.addLast(request);
+            queueLeftTotal.incrementAndGet();
+        }finally {
+            if(null != lock){
+                lock.unlock();
+            }
+        }
     }
 
     @Override
@@ -149,7 +158,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         if(null != jumpRequest){
             return jumpRequest;
         }
-        long total = queueLeftTotal.sum();
+        long total = getLeftRequestCount();
         long limit = spiderConfig.getQueueNum() * 1000;
         if(total < limit){
             Request infoRequest = poll(getQueueKey(task, false, null));
@@ -163,7 +172,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     private Request poll(String queueKey){
         RDeque<Object> deque = redissonClient.getDeque(queueKey);
         Request request = pollWithStatus(deque);
-        long total = queueLeftTotal.sum();
+        long total = getLeftRequestCount();
         log.info("queueKey: {} ,弹出 request:{} ,当前队列数据数量：{} , 队列数据总数量：{}",
                 queueKey,request == null ? "" : request.getUrl(),deque.size(),total);
         return request;
@@ -176,7 +185,8 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
                 return null;
             }
             Request request = (Request)deque.pollFirst();
-            queueLeftTotal.decrement();
+            RAtomicLong queueLeftTotal = getQueueLeftTotal();
+            queueLeftTotal.decrementAndGet();
             if(null == request){
                 continue;
             }
@@ -200,8 +210,22 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public int getLeftRequestsCount(Task task) {
-        return (int)queueLeftTotal.sum();
+        return (int)getLeftRequestCount();
     }
+
+    public long getLeftRequestCount(){
+        RAtomicLong queueLeftTotal = getQueueLeftTotal();
+        return queueLeftTotal.get();
+    }
+
+    public RAtomicLong getQueueLeftTotal(){
+         return redissonClient.getAtomicLong(QUEUE_TOTAL);
+    }
+
+    public RSet<String> getQueueSet(){
+        return redissonClient.getSet(RedisKeyConst.spiderKeySpace+ QUEUE_SET);
+    }
+
 
     public int getLeftRequestsCount(String domain){
         if(StrUtil.isBlank(domain)){
