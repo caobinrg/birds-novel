@@ -58,26 +58,33 @@ public class ClickQueueMessageReceive implements ApplicationRunner {
                     continue;
                 }
                 lock = redissonClient.getLock(novelId);
-                lock.tryLock(3,6,TimeUnit.SECONDS);
-                NovelConver novelConver = novelConverService.getByNovelId(novelId);
-                if(null != novelConver){
-                    //更新数据
-                    novelConver.setClickNum(novelConver.getClickNum() + 1);
+                boolean tryLock = false;
+                while (!tryLock){
+                    tryLock = lock.tryLock(3, 6, TimeUnit.SECONDS);
+                    if(!tryLock){
+                        TimeUnit.MILLISECONDS.sleep(500);
+                        continue;
+                    }
+                    NovelConver novelConver = novelConverService.getByNovelId(novelId);
+                    if(null != novelConver){
+                        //更新数据
+                        novelConver.setClickNum(novelConver.getClickNum() + 1);
+                        novelConver.setUpdateTime(date);
+                        novelConverService.save(novelConver);
+                        continue;
+                    }
+                    Novel novel = novelService.getByNovelId(novelId);
+                    if(null == novel || StrUtil.isBlank(novel.getNovelId())){
+                        continue;
+                    }
+                    novelConver = new NovelConver();
+
+                    BeanUtil.copyProperties(novel,novelConver);
+                    novelConver.setClickNum(1L);
+                    novelConver.setCreateTime(date);
                     novelConver.setUpdateTime(date);
                     novelConverService.save(novelConver);
-                    continue;
                 }
-                Novel novel = novelService.getByNovelId(novelId);
-                if(null == novel || StrUtil.isBlank(novel.getNovelId())){
-                    continue;
-                }
-                novelConver = new NovelConver();
-
-                BeanUtil.copyProperties(novel,novelConver);
-                novelConver.setClickNum(1L);
-                novelConver.setCreateTime(date);
-                novelConver.setUpdateTime(date);
-                novelConverService.save(novelConver);
             } catch (InterruptedException e) {
                 log.info(e.getMessage(),e);
             }finally {
