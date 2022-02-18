@@ -69,9 +69,10 @@ public class NovelService {
             }
             return dbNovel;
         } catch (InterruptedException e) {
-           throw e;
+            log.info(e.getMessage(),e);
+            throw e;
         }finally {
-            if(null != lock){
+            if(null != lock && lock.isHeldByCurrentThread()){
                 lock.unlock();
             }
         }

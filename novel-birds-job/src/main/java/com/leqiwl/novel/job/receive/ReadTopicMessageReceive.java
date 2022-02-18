@@ -8,6 +8,7 @@ import com.leqiwl.novel.domain.entify.Novel;
 import com.leqiwl.novel.domain.entify.NovelConver;
 import com.leqiwl.novel.service.NovelConverService;
 import com.leqiwl.novel.service.NovelService;
+import com.leqiwl.novel.util.Spinlock;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RLock;
@@ -38,66 +39,43 @@ public class ReadTopicMessageReceive implements ApplicationRunner {
     @Resource
     private NovelConverService novelConverService;
 
-    @Resource
-    private NovelService novelService;
-
     @Async("birdsExecutor")
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        while (true){
-            RLock lock = null;
+        while (!Thread.currentThread().isInterrupted()){
             try {
                 RBlockingQueue<NovelIdTopicDto> blockingQueue =
                         redissonClient.getBlockingQueue(TopicAndQueueKeyConst.READ_QUEUE);
                 NovelIdTopicDto novelIdTopicDto = blockingQueue.take();
                 //阅读
                 log.info("线程：{},收到阅读消息：{}",Thread.currentThread().getName(),novelIdTopicDto);
-                Date date = new Date();
                 String novelId = novelIdTopicDto.getNovelId();
-                if(StrUtil.isBlank(novelId)){
-                    continue;
-                }
-                lock = redissonClient.getLock(novelId);
-                boolean tryLock = false;
-                while (!tryLock){
-                    tryLock = lock.tryLock(3, 6, TimeUnit.SECONDS);
-                    if(!tryLock){
-                        TimeUnit.MILLISECONDS.sleep(500);
-                        continue;
-                    }
+                Spinlock<Object> spinlock = new Spinlock<>(redissonClient, novelId);
+                spinlock.process(null,o -> {
                     NovelConver novelConver = novelConverService.getByNovelId(novelId);
                     if(null != novelConver){
                         //更新数据
                         novelConver.setReadNum(novelConver.getReadNum() + 1);
                         novelConver.setClickNum(novelConver.getClickNum() + 1);
-                        novelConver.setUpdateTime(date);
+                        novelConver.setUpdateTime(new Date());
                         novelConverService.save(novelConver);
-                        continue;
+                        return;
                     }
-                    Novel novel = novelService.getByNovelId(novelId);
-                    if(null == novel || StrUtil.isBlank(novel.getNovelId())){
-                        continue;
-                    }
-                    novelConver = new NovelConver();
-
-                    BeanUtil.copyProperties(novel,novelConver);
+                    novelConver = novelConverService.generateConver(novelId);
                     novelConver.setReadNum(1L);
                     novelConver.setClickNum(1L);
-                    novelConver.setCreateTime(date);
-                    novelConver.setUpdateTime(date);
                     novelConverService.save(novelConver);
-                }
+                });
+
             } catch (InterruptedException e) {
                 log.info(e.getMessage(),e);
-            }finally {
-                if(null != lock){
-                    lock.unlock();
-                }
+                throw e;
             }
             try {
                 TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e) {
                 log.info(e.getMessage(),e);
+                throw e;
             }
         }
 
