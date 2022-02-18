@@ -93,11 +93,14 @@ public class SpiderStartContainer extends Spider {
             logger.info("===================== spider:{}，status:{} is to stop ====================="
                     ,this.getUUID(),this.getSpiderStatus());
         }
-        if(this.stat.intValue() == 2 || this.stat.intValue() == 0){
-            this.start();
-
-            this.status = this.stat.intValue();
+        if(this.stat.intValue() == 2){
+//            this.stat.set(1);
+            this.stat.compareAndSet(2, 1);
         }
+        if(this.stat.intValue() == 0){
+            this.start();
+        }
+        this.status = this.stat.intValue();
         logger.info("===================== spider:{},status:{} is start ====================="
                 ,this.getUUID(),this.getSpiderStatus());
         spiderCountDown(countDownSpace);
@@ -113,7 +116,7 @@ public class SpiderStartContainer extends Spider {
         }
         requestInfo.setJump(true);
         this.addRequest(request);
-//        spiderStart();
+        spiderStart();
     }
 
     public String getSpiderUUID() {

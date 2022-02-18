@@ -57,13 +57,14 @@ public class SpiderStartContainerFactory {
     @Resource
     private RedissonClient redissonClient;
 
-    private static final Map<String, SpiderStartContainer> startContainerMap = Collections.synchronizedMap(new HashMap<>());
+    private static final  Map<String, SpiderStartContainer> startContainerMap = Collections.synchronizedMap(new HashMap<>());
 
-    public SpiderStartContainer getStartContainer(String domain) {
-        if(startContainerMap.get(domain) != null){
-            return startContainerMap.get(domain);
+    public synchronized SpiderStartContainer getStartContainer(String domain) {
+        SpiderStartContainer spiderStartContainer = startContainerMap.get(domain);
+        if(spiderStartContainer != null){
+            return spiderStartContainer;
         }
-        SpiderStartContainer spiderStartContainer =
+        spiderStartContainer =
                 SpiderStartContainer.create(spiderProcessor, spiderEventListener, redissonClient);
         spiderStartContainer.setDownloader(spiderDownloader);
         spiderStartContainer.setScheduler(spiderRedisScheduler);

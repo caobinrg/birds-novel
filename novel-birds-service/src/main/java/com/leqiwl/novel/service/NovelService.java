@@ -48,19 +48,26 @@ public class NovelService {
     @CachePut(cacheNames = "novel#2m", key="#novel.getIdMark()")
     public Novel save(Novel novel) throws InterruptedException {
         RLock lock = null;
+        Novel dbNovel = null;
         try {
             lock = redissonClient.getLock("novelSave" + novel.getIdMark());
-            lock.tryLock(3,6, TimeUnit.SECONDS);
-            Novel dbNovel = this.novelRepository.getNovelByIdMark(novel.getIdMark());
-            if(null == dbNovel){
-                return this.novelRepository.save(novel);
+            boolean tryLock = false;
+            while (!tryLock){
+                tryLock = lock.tryLock(3, 6, TimeUnit.SECONDS);
+                if(!tryLock){
+                    TimeUnit.SECONDS.sleep(3);
+                }
+                dbNovel = this.novelRepository.getNovelByIdMark(novel.getIdMark());
+                if(null == dbNovel){
+                    return this.novelRepository.save(novel);
+                }
+                if(novel.getNovelId().equals(dbNovel.getNovelId())){
+                    novel.setId(dbNovel.getId());
+                    return this.novelRepository.save(novel);
+                }
+                //idMark 冲突，忽略改书
             }
-            if(novel.getNovelId().equals(dbNovel.getNovelId())){
-                novel.setId(dbNovel.getId());
-                return this.novelRepository.save(novel);
-            }
-            //idMark 冲突，忽略改书
-           return dbNovel;
+            return dbNovel;
         } catch (InterruptedException e) {
            throw e;
         }finally {
