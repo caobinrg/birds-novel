@@ -19,6 +19,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Request;
+import us.codecraft.webmagic.utils.UrlUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -67,6 +68,7 @@ public class SpiderStart implements ApplicationRunner, SpiderContainerRemote,Spi
                     .build();
             request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
             SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(getDomain(url));
+            spiderStartContainer.spiderResetDuplicateCheckByDomain(UrlUtils.getDomain(url));
             spiderStartContainer.addRequest(request);
             spiderStartContainer.spiderStart();
             status = 1;

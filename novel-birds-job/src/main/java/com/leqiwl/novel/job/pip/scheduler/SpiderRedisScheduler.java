@@ -21,6 +21,8 @@ import us.codecraft.webmagic.scheduler.component.DuplicateRemover;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 自定义调度器，将下载器传递过来的请求保存到redis中，进行url去重，弹出请求
@@ -49,9 +51,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
      */
     private static final String SET_PREFIX = "set_";
 
-    private static final String QUEUE_SET = "queueSet";
-
-    private static final String QUEUE_TOTAL = "queueLeftTotalAtomic";
+    private static final String QUEUE_NAME_SET = "queueNameSet";
 
     @Resource
     private CrawlerRuleService crawlerRuleService;
@@ -62,37 +62,45 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Resource
     private SpiderConfig spiderConfig;
 
-    @PostConstruct
-    public void post(){
-        RAtomicLong queueLeftTotal = getQueueLeftTotal();
-        if(queueLeftTotal.get() == 0){
-            RSet<String> queueSet = getQueueSet();
-            for (String key : queueSet) {
-                queueLeftTotal.addAndGet(redissonClient.getDeque(key).size());
-            }
-            log.info("SpiderRedisScheduler queueLeftTotal init , total:{}",queueLeftTotal.get());
-        }
+    protected String getSetKey(Task task) {
+        String uuid = task.getUUID();
+        return getSetKey(uuid);
     }
 
-    protected String getSetKey(Task task) {
-        return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, task.getUUID());
+    protected String getSetKey(String uuid) {
+        return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, uuid);
     }
 
     protected String getQueueKey(Task task,boolean isJump, Integer type) {
+        return getQueueKey(task.getUUID(),isJump,type);
+
+    }
+
+    private String getQueueKey(String uuid,boolean isJump, Integer type){
         if(isJump){
-            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_JUMP, task.getUUID());
+            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_JUMP, uuid);
         }
         if(!CrawlerTypeEnum.CONTENT.getType().equals(type)){
-            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_INFO_PREFIX, task.getUUID());
+            return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_INFO_PREFIX, uuid);
         }
-        return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_CONTENT_PREFIX, task.getUUID());
-
+        return StringUtils.join( RedisKeyConst.spiderKeySpace, QUEUE_CONTENT_PREFIX, uuid);
     }
 
     @Override
     public void resetDuplicateCheck(Task task) {
-        RSet<Object> urlSet = redissonClient.getSet(getSetKey(task));
+        String setKey = getSetKey(task);
+        RSet<Object> urlSet = redissonClient.getSet(setKey);
+        log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
         urlSet.delete();
+        log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
+    }
+
+    public void resetDuplicateCheck(String domain) {
+        String setKey = getSetKey(domain);
+        RSet<Object> urlSet = redissonClient.getSet(setKey);
+        log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
+        urlSet.delete();
+        log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
     }
 
     @Override
@@ -107,7 +115,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         RSetCache<Object> urlSet = redissonClient.getSetCache(getSetKey(task));
         boolean has = urlSet.contains(request.getUrl());
         if(!has){
-            urlSet.add(request.getUrl());
+            urlSet.add(request.getUrl(),10, TimeUnit.MINUTES);
             return false;
         }
         CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
@@ -131,19 +139,15 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         Integer type = requestInfo.getType();
         // 将request推入redis队列中
         String queueKey = getQueueKey(task, jump,type);
+        requestInfo.setJump(false);
         RLock lock = null;
         try {
-            lock = redissonClient.getLock(QUEUE_SET);
+            lock = redissonClient.getLock(QUEUE_NAME_SET);
             lock.lock();
             RDeque<Object> deque = redissonClient.getDeque(queueKey);
             RSet<String> queueSet = getQueueSet();
-            RAtomicLong queueLeftTotal = getQueueLeftTotal();
-            if(!queueSet.contains(queueKey)){
-                queueLeftTotal.addAndGet(deque.size());
-                queueSet.add(queueKey);
-            }
+            queueSet.add(queueKey);
             deque.addLast(request);
-            queueLeftTotal.incrementAndGet();
         }finally {
             if(null != lock){
                 lock.unlock();
@@ -154,25 +158,25 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Override
     public Request poll(Task task) {
         // 从队列中弹出一个url
-        Request jumpRequest = poll(getQueueKey(task, true, null));
+        Request jumpRequest = poll(getQueueKey(task, true, null),task);
         if(null != jumpRequest){
             return jumpRequest;
         }
-        long total = getLeftRequestCount();
+        long total = getDomainLeftRequestByTask(task);
         long limit = spiderConfig.getQueueNum() * 1000;
         if(total < limit){
-            Request infoRequest = poll(getQueueKey(task, false, null));
+            Request infoRequest = poll(getQueueKey(task, false, null),task);
             if(null != infoRequest){
                 return infoRequest;
             }
         }
-        return poll(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()));
+        return poll(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()),task);
     }
 
-    private Request poll(String queueKey){
+    private Request poll(String queueKey,Task task){
         RDeque<Object> deque = redissonClient.getDeque(queueKey);
         Request request = pollWithStatus(deque);
-        long total = getLeftRequestCount();
+        long total = getDomainLeftRequestByTask(task);
         log.info("queueKey: {} ,弹出 request:{} ,当前队列数据数量：{} , 队列数据总数量：{}",
                 queueKey,request == null ? "" : request.getUrl(),deque.size(),total);
         return request;
@@ -185,8 +189,6 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
                 return null;
             }
             Request request = (Request)deque.pollFirst();
-            RAtomicLong queueLeftTotal = getQueueLeftTotal();
-            queueLeftTotal.decrementAndGet();
             if(null == request){
                 continue;
             }
@@ -214,16 +216,28 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     }
 
     public long getLeftRequestCount(){
-        RAtomicLong queueLeftTotal = getQueueLeftTotal();
-        return queueLeftTotal.get();
+        AtomicLong atomicLong = new AtomicLong();
+        RSet<String> queueSet = getQueueSet();
+        for (String key : queueSet) {
+            atomicLong.addAndGet(redissonClient.getDeque(key).size());
+        }
+        return atomicLong.get();
     }
 
-    public RAtomicLong getQueueLeftTotal(){
-         return redissonClient.getAtomicLong(QUEUE_TOTAL);
+    public long getDomainLeftRequestByTask(Task task){
+        String domain = task.getUUID();
+        return getDomainLeftRequestByDomain(domain);
+    }
+
+    public long getDomainLeftRequestByDomain(String domain){
+        RDeque<Object> jumpDeque = redissonClient.getDeque(getQueueKey(domain, true, null));
+        RDeque<Object> infoDeque = redissonClient.getDeque(getQueueKey(domain, false, null));
+        RDeque<Object> contentDeque = redissonClient.getDeque(getQueueKey(domain,false,CrawlerTypeEnum.CONTENT.getType()));
+        return jumpDeque.size() + infoDeque.size() + contentDeque.size();
     }
 
     public RSet<String> getQueueSet(){
-        return redissonClient.getSet(RedisKeyConst.spiderKeySpace+ QUEUE_SET);
+        return redissonClient.getSet(RedisKeyConst.spiderKeySpace+ QUEUE_NAME_SET);
     }
 
 

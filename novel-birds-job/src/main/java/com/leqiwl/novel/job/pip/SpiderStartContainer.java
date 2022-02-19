@@ -49,9 +49,6 @@ public class SpiderStartContainer extends Spider {
     @Override
     public void run() {
         super.run();
-        if(scheduler != null && scheduler instanceof DuplicateRemover) {
-            ((DuplicateRemover) scheduler).resetDuplicateCheck(this);
-        }
         //TODO 爬虫任务完成时处理爬取失败的请求
         List<Request> failRequests = listener.getFailRequests();
         if(CollectionUtils.isNotEmpty(failRequests)) {
@@ -64,6 +61,18 @@ public class SpiderStartContainer extends Spider {
         super.close();
         this.status = 3;
     }
+
+    public void spiderResetDuplicateCheck(){
+        if(scheduler != null && scheduler instanceof DuplicateRemover && this.stat.intValue() != 1) {
+            ((DuplicateRemover) scheduler).resetDuplicateCheck(this);
+        }
+    }
+    public void spiderResetDuplicateCheckByDomain(String domain){
+        if(scheduler != null && scheduler instanceof DuplicateRemover && this.stat.intValue() != 1) {
+            ((SpiderRedisScheduler) scheduler).resetDuplicateCheck(domain);
+        }
+    }
+
 
     public void spiderClose(String countDownSpace) {
         this.close();
