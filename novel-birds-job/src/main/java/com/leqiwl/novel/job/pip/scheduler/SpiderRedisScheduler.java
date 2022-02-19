@@ -89,7 +89,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Override
     public void resetDuplicateCheck(Task task) {
         String setKey = getSetKey(task);
-        RSet<Object> urlSet = redissonClient.getSet(setKey);
+        RSetCache<Object> urlSet = redissonClient.getSetCache(setKey);
         log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
         urlSet.delete();
         log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
@@ -97,7 +97,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     public void resetDuplicateCheck(String domain) {
         String setKey = getSetKey(domain);
-        RSet<Object> urlSet = redissonClient.getSet(setKey);
+        RSetCache<Object> urlSet = redissonClient.getSetCache(setKey);
         log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
         urlSet.delete();
         log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
