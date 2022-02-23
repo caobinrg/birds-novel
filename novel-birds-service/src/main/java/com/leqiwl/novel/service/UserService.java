@@ -203,6 +203,7 @@ public class UserService {
             return false;
         }
         user.setHis(his);
+        user.setUpdateTime(new Date());
         userRepository.save(user);
         return true;
     }
