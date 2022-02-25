@@ -1,5 +1,7 @@
 package com.leqiwl.novel.job.pip.scheduler;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.leqiwl.novel.config.sysconst.RedisKeyConst;
 import com.leqiwl.novel.config.sysconst.RequestConst;
@@ -19,8 +21,9 @@ import us.codecraft.webmagic.scheduler.DuplicateRemovedScheduler;
 import us.codecraft.webmagic.scheduler.MonitorableScheduler;
 import us.codecraft.webmagic.scheduler.component.DuplicateRemover;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -49,7 +52,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     /**
      * 用于对url去重
      */
-    private static final String SET_PREFIX = "set_";
+    private static final String MAP_PREFIX = "map_";
 
     private static final String QUEUE_NAME_SET = "queueNameSet";
 
@@ -62,14 +65,24 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
     @Resource
     private SpiderConfig spiderConfig;
 
-    protected String getSetKey(Task task) {
+//    protected String getSetKey(Task task) {
+//        String uuid = task.getUUID();
+//        return getSetKey(uuid);
+//    }
+//
+//    protected String getSetKey(String uuid) {
+//        return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, uuid);
+//    }
+
+    protected String getMapKey(Task task) {
         String uuid = task.getUUID();
-        return getSetKey(uuid);
+        return getMapKey(uuid);
     }
 
-    protected String getSetKey(String uuid) {
-        return StringUtils.join(RedisKeyConst.spiderKeySpace, SET_PREFIX, uuid);
+    protected String getMapKey(String uuid) {
+        return StringUtils.join(RedisKeyConst.spiderKeySpace, MAP_PREFIX, uuid);
     }
+
 
     protected String getQueueKey(Task task,boolean isJump, Integer type) {
         return getQueueKey(task.getUUID(),isJump,type);
@@ -88,19 +101,19 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public void resetDuplicateCheck(Task task) {
-        String setKey = getSetKey(task);
-        RSetCache<Object> urlSet = redissonClient.getSetCache(setKey);
-        log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
-        urlSet.delete();
-        log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
+        String mapKey = getMapKey(task);
+        RMapCache<String, DuplicateRequest> urlMap = redissonClient.getMapCache(mapKey);
+        log.info("before del urlSet setKey:{},size:{}",mapKey,urlMap.size());
+        urlMap.delete();
+        log.info("after del urlSet setKey:{},size:{}",mapKey,urlMap.size());
     }
 
     public void resetDuplicateCheck(String domain) {
-        String setKey = getSetKey(domain);
-        RSetCache<Object> urlSet = redissonClient.getSetCache(setKey);
-        log.info("before del urlSet setKey:{},size:{}",setKey,urlSet.size());
-        urlSet.delete();
-        log.info("after del urlSet setKey:{},size:{}",setKey,urlSet.size());
+        String mapKey = getMapKey(domain);
+        RMapCache<String, DuplicateRequest> urlMap = redissonClient.getMapCache(mapKey);
+        log.info("before del urlSet setKey:{},size:{}",mapKey,urlMap.size());
+        urlMap.delete();
+        log.info("after del urlSet setKey:{},size:{}",mapKey,urlMap.size());
     }
 
     @Override
@@ -112,10 +125,13 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public boolean isDuplicate(Request request, Task task) {
-        RSetCache<Object> urlSet = redissonClient.getSetCache(getSetKey(task));
-        boolean has = urlSet.contains(request.getUrl());
+        int cacheTime = 15;
+        RMapCache<String, DuplicateRequest> urlMap = redissonClient.getMapCache(getMapKey(task));
+        String url = request.getUrl();
+        boolean has = urlMap.containsKey(url);
+        Date now = new Date();
         if(!has){
-            urlSet.add(request.getUrl(),10, TimeUnit.MINUTES);
+            urlMap.put(url, new DuplicateRequest(url, now),cacheTime, TimeUnit.MINUTES);
             return false;
         }
         CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
@@ -123,6 +139,13 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             boolean jump = requestInfo.isJump();
             //插队
             if(jump){
+                return false;
+            }
+            DuplicateRequest duplicateRequest = urlMap.get(url);
+            Date putTime = duplicateRequest.getPutTime();
+            long between = DateUtil.between(putTime, now, DateUnit.MS);
+            if(between >= cacheTime){
+                urlMap.put(url, new DuplicateRequest(url, now),cacheTime, TimeUnit.MINUTES);
                 return false;
             }
         }
@@ -254,15 +277,46 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
 
     @Override
     public int getTotalRequestsCount(Task task) {
-        RSetCache<Object> urlSet = redissonClient.getSetCache(getSetKey(task));
-        return urlSet.size();
+        RMapCache<Object, Object> urlMap = redissonClient.getMapCache(getMapKey(task));
+        return urlMap.size();
     }
 
     public int getTotalRequestsCountByDomain(String domain) {
         if(StrUtil.isBlank(domain)){
             return 0;
         }
-        RSetCache<Object> urlSet = redissonClient.getSetCache(RedisKeyConst.spiderKeySpace + SET_PREFIX + domain);
+        RSetCache<Object> urlSet = redissonClient.getSetCache(RedisKeyConst.spiderKeySpace + MAP_PREFIX + domain);
         return urlSet.size();
     }
+
+
+    static class DuplicateRequest implements Serializable {
+
+        public DuplicateRequest(String url, Date putTime) {
+            this.url = url;
+            this.putTime = putTime;
+        }
+
+        private String url;
+
+        private Date putTime;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public Date getPutTime() {
+            return putTime;
+        }
+
+        public void setPutTime(Date putTime) {
+            this.putTime = putTime;
+        }
+
+    }
+
 }

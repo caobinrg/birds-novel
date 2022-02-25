@@ -252,7 +252,7 @@ public class NovelInfoProcessor implements NovelProcessor{
         List<Chapter> chapterList = new ArrayList<>();
         if(null != novel && null != novel.getChapterList()){
             chapterList = chapterService.findByNovelId(novelId);
-            chapterMap = chapterList.stream().collect(Collectors.toMap(Chapter::getIdMark, Chapter -> Chapter ));
+            chapterMap = chapterList.stream().collect(Collectors.toMap(Chapter::getIdMark, Chapter -> Chapter ,(v1, v2) -> v1));
             if(chapterList.size() != chapterMap.size()){
                 //todo 处理重复章节
             }
