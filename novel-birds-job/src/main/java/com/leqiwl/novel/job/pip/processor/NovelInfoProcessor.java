@@ -118,7 +118,7 @@ public class NovelInfoProcessor implements NovelProcessor{
         if(chapterList.size()<=5){
             infoChapterSize = chapterList.size();
         }
-        List<Chapter> novelChapters = CollectionUtil.reverseNew(chapterList).subList(0, infoChapterSize);
+        List<Chapter> novelChapters = new ArrayList<>(CollectionUtil.reverseNew(chapterList).subList(0, infoChapterSize));
         //字数
         String wordNum = "0";
         if(StrUtil.isNotBlank(detailRule.getWordNumRule())){
