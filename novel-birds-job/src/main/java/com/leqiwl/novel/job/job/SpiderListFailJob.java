@@ -5,6 +5,7 @@ import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerRule;
 import com.leqiwl.novel.job.pip.SpiderStartContainer;
 import com.leqiwl.novel.job.pip.SpiderStartContainerFactory;
+import com.leqiwl.novel.job.pip.downloader.SpiderDownloader;
 import com.leqiwl.novel.job.pip.listener.SpiderEventListener;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ import java.util.Set;
 public class SpiderListFailJob {
 
     @Resource
-    private SpiderEventListener spiderEventListener;
+    private SpiderDownloader spiderDownloader;
 
     @Autowired
     private SpiderStartContainerFactory spiderStartContainerFactory;
@@ -42,14 +43,18 @@ public class SpiderListFailJob {
     @Scheduled(cron = "0 0/15 * * * ? ")
     private void configureTasks() {
         log.info("fail scheduled start");
-        RMap<String, Request> failMap = spiderEventListener.getFailMap();
+        RMap<String, SpiderDownloader.RetryRequest> failMap = spiderDownloader.getFailMap();
         if(null == failMap || failMap.size() < 1){
             return;
         }
         Set<String> keySet = failMap.keySet();
         ArrayList<String> keys = new ArrayList<>(keySet);
         for (String key : keys) {
-            Request request = failMap.get(key);
+            SpiderDownloader.RetryRequest retryRequest = failMap.get(key);
+            if(null == retryRequest){
+                continue;
+            }
+            Request request = retryRequest.getRequest();
             if(null == request){
                 continue;
             }

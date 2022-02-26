@@ -11,7 +11,6 @@ import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import com.leqiwl.novel.service.DelayQueueService;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.RequestInfo;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
