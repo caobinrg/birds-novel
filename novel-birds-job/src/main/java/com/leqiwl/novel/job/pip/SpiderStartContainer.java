@@ -46,6 +46,18 @@ public class SpiderStartContainer extends Spider {
         return new SpiderStartContainer(pageProcessor,listener, redissonClient);
     }
 
+//    @Override
+//    public void runAsync() {
+//        if(null != this.executorService){
+//            this.executorService.execute(this);
+//        }else{
+//            Thread thread = new Thread(this);
+//            thread.setDaemon(false);
+//            thread.start();
+//        }
+//    }
+
+
     @Override
     public void run() {
         super.run();
