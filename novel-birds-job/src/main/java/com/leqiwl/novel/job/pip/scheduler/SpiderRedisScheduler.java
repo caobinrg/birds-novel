@@ -187,11 +187,15 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
         }
         long total = getDomainLeftRequestByTask(task);
         long limit = spiderConfig.getQueueNum() * 1000;
-        if(total < limit){
-            Request infoRequest = poll(getQueueKey(task, false, null),task);
-            if(null != infoRequest){
-                return infoRequest;
+        if(total > limit){
+            Request contentRequest = poll(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()),task);
+            if(null != contentRequest){
+                return contentRequest;
             }
+        }
+        Request infoRequest = poll(getQueueKey(task, false, null), task);
+        if(null != infoRequest){
+            return infoRequest;
         }
         return poll(getQueueKey(task,false,CrawlerTypeEnum.CONTENT.getType()),task);
     }
