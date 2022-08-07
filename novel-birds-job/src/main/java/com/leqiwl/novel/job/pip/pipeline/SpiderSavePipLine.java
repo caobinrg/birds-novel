@@ -14,6 +14,7 @@ import com.leqiwl.novel.enums.CrawlerTypeEnum;
 import com.leqiwl.novel.service.ChapterService;
 import com.leqiwl.novel.service.ContentService;
 import com.leqiwl.novel.service.NovelService;
+import com.leqiwl.novel.service.TopicAndQueuePushService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,11 +47,18 @@ public class SpiderSavePipLine implements Pipeline {
     @Resource
     private ContentService contentService;
 
+    @Resource
+    private TopicAndQueuePushService topicAndQueuePushService;
+
+
     @Value("${novelImagePath}")
     private String novelImagePath;
 
     @Value("${location.image}")
     private String baseImagePath;
+
+    @Value("${baiduPush.siteBaseUrl}")
+    private String siteBaseURL;
 
     @SneakyThrows
     @Override
@@ -118,6 +126,7 @@ public class SpiderSavePipLine implements Pipeline {
                 contentService.save(content);
                 long saveEnd = System.currentTimeMillis();
                 log.info("持久化content:---content:{}持久化耗时:{}ms",content.getChapterId(),(saveEnd-saveStart));
+                topicAndQueuePushService.sendSaveUrl(siteBaseURL + content.getNovelId() + "/" + content.getChapterId());
             }
         }
     }
@@ -210,6 +219,8 @@ public class SpiderSavePipLine implements Pipeline {
                     novelId = novel.getNovelId();
                     long saveEnd = System.currentTimeMillis();
                     log.info("持久化novel---novel:{}持久化耗时:{}ms",novel.getNovelId(),(saveEnd-saveStart));
+                    //持久化完成后 推送url到队列，供后续进行 搜索引擎 推送
+                    topicAndQueuePushService.sendSaveUrl(siteBaseURL + novelId);
                 }
             }
             return this;

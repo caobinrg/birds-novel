@@ -9,3 +9,6 @@ spider:
   sleepTime: 3000
   timeOut: 8000
   queueNum: 100
+baiduPush:
+  pushUrl: "http://data.zz.baidu.com/urls?site=xxx&token=xxx"
+  siteBaseUrl: "https://www.xxx.com/web/page/"
