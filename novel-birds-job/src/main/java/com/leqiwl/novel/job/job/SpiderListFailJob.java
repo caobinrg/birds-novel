@@ -1,23 +1,26 @@
 package com.leqiwl.novel.job.job;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
+import com.leqiwl.novel.domain.entify.crawler.CrawlerListRule;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerRule;
+import com.leqiwl.novel.enums.CrawlerTypeEnum;
 import com.leqiwl.novel.job.pip.SpiderStartContainer;
 import com.leqiwl.novel.job.pip.SpiderStartContainerFactory;
 import com.leqiwl.novel.job.pip.downloader.SpiderDownloader;
-import com.leqiwl.novel.job.pip.listener.SpiderEventListener;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Request;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static us.codecraft.webmagic.utils.UrlUtils.getDomain;
 
 /**
  * @author: 飞鸟不过江
@@ -42,36 +45,30 @@ public class SpiderListFailJob {
      */
     @Scheduled(cron = "0 0/15 * * * ? ")
     private void configureTasks() {
-        log.info("fail scheduled start");
-        RMap<String, SpiderDownloader.RetryRequest> failMap = spiderDownloader.getFailMap();
-        if(null == failMap || failMap.size() < 1){
+        List<CrawlerRule> allRules = crawlerRuleService.getAll();
+        List<CrawlerRule> collect = allRules.stream()
+                .filter(rule -> rule.getOpenStatus() == 1 && rule.getInitStatus() == 1)
+                .collect(Collectors.toList());
+        if(CollectionUtil.isEmpty(collect)){
             return;
         }
-        Set<String> keySet = failMap.keySet();
-        ArrayList<String> keys = new ArrayList<>(keySet);
-        for (String key : keys) {
-            SpiderDownloader.RetryRequest retryRequest = failMap.get(key);
-            if(null == retryRequest){
-                continue;
-            }
-            Request request = retryRequest.getRequest();
-            if(null == request){
-                continue;
-            }
-            CrawlerRequestDto requestInfo = request.getExtra(RequestConst.REQUEST_INFO);
-            String ruleId = requestInfo.getRuleId();
-            CrawlerRule crawlerRule = crawlerRuleService.getByRuleId(ruleId);
-            int openStatus = crawlerRule.getOpenStatus();
-            if(0 == openStatus){
-                failMap.remove(key);
-                continue;
-            }
-            SpiderStartContainer startContainer = spiderStartContainerFactory.getStartContainer(request);
-            startContainer.addRequest(request);
-            Integer spiderStatus = startContainer.getSpiderStatus();
-            if(1 != spiderStatus){
-                startContainer.spiderStart();
-            }
+        for (CrawlerRule crawlerRule : collect) {
+            CrawlerListRule listRule = crawlerRule.getListRule();
+            String sourceUrl = listRule.getSourceUrl();
+            int pageStartRule = listRule.getPageStartRule();
+            String url = sourceUrl.replace(RequestConst.PAGE_REPLACE,pageStartRule+"");
+            Request request = new Request(url);
+            CrawlerRequestDto requestInfo = CrawlerRequestDto.builder()
+                    .url(url)
+                    .ruleId(crawlerRule.getRuleId())
+//                    .baseUrl("")
+                    .type(CrawlerTypeEnum.LIST.getType())
+                    .build();
+            request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
+            SpiderStartContainer spiderStartContainer = spiderStartContainerFactory.getStartContainer(getDomain(url));
+            spiderStartContainer.spiderResetDuplicateCheckByDomain(getDomain(url));
+            spiderStartContainer.addRequest(request);
+            spiderStartContainer.spiderStart();
         }
     }
 

@@ -126,7 +126,7 @@ public class SpiderSavePipLine implements Pipeline {
                 contentService.save(content);
                 long saveEnd = System.currentTimeMillis();
                 log.info("持久化content:---content:{}持久化耗时:{}ms",content.getChapterId(),(saveEnd-saveStart));
-                topicAndQueuePushService.sendSaveUrl(siteBaseURL + content.getNovelId() + "/" + content.getChapterId());
+                topicAndQueuePushService.sendSaveUrl(siteBaseURL + content.getNovelId() + "/" + content.getChapterId() + ".html");
             }
         }
     }
@@ -220,7 +220,7 @@ public class SpiderSavePipLine implements Pipeline {
                     long saveEnd = System.currentTimeMillis();
                     log.info("持久化novel---novel:{}持久化耗时:{}ms",novel.getNovelId(),(saveEnd-saveStart));
                     //持久化完成后 推送url到队列，供后续进行 搜索引擎 推送
-                    topicAndQueuePushService.sendSaveUrl(siteBaseURL + novelId);
+                    topicAndQueuePushService.sendSaveUrl(siteBaseURL + novelId + ".html");
                 }
             }
             return this;

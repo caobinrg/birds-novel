@@ -143,7 +143,7 @@ public class SpiderRedisScheduler extends DuplicateRemovedScheduler implements M
             }
             DuplicateRequest duplicateRequest = urlMap.get(url);
             Date putTime = duplicateRequest.getPutTime();
-            long between = DateUtil.between(putTime, now, DateUnit.MS);
+            long between = DateUtil.between(putTime, now, DateUnit.MINUTE);
             if(between >= cacheTime){
                 urlMap.put(url, new DuplicateRequest(url, now),cacheTime, TimeUnit.MINUTES);
                 return false;
