@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书城_' + webSiteName},
+    keywords=${'书城,' + webSiteKeywords},
+    description=${'书城,'+webSiteDescription})">
+    </head>
+    <style>
+        .grid {
+            position: relative;
+            float: left;
+            padding: 20px 10px;
+            width: 33.33%;
+            box-sizing: border-box;
+            text-decoration: none;
+            display: inline-block;
+            height: 7em;
+            margin-bottom: 5px;
+        }
+        .grid img{
+            position: relative;
+            right: 0.5em;
+            width: 3em;
+            height: 4em;
+        }
+        .weui-grid__label{
+            margin-top: 3em !important;
+        }
+        #searchBar{
+            background-color: white;
+            border: none;
+        }
+        .weui-media-box_appmsg .weui-media-box__thumb {
+            width: auto;
+            vertical-align: top;
+        }
+        .update_content{
+            padding-bottom: 4em;
+        }
+        .weui-cell{
+            border-top: #f6f6f6  1px solid;
+            border-bottom: #f6f6f6 1px solid;
+        }
+    </style>
+</head>
+<body>
+<div>
+
+    <div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form" action="#">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="" type="search">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);">
+                <i class="weui-icon-search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-62 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;书荒推荐
+        </div>
+        <div class="weui-cell__ft">
+            <div>
+                <i class="icon icon-21 f25 weui-tabbar__icon" ></i>
+                <span>换一换</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="weui-grids"  >
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗12312312312312
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <img src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <p class="weui-grid__label">
+                按钮来了吗
+            </p>
+        </a>
+    </div>
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-65 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;站长推荐
+        </div>
+    </div>
+
+
+    <div class="weui-panel__bd">
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-91 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;最近更新
+        </div>
+    </div>
+
+
+    <div class="weui-panel__bd update_content" >
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+        <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" src="https://www.sundung.com/NBA_kaijuyizhangsanfentiyanka.jpg" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">NBA：开局一张三分体验卡</h4>
+                <p class="weui-media-box__desc">在NBA流浪两年的王毅，在与湖人10天短合同的最后一天，突然获得超神三分体验卡，从此开启了一代超级巨星的传奇之旅。　　库里：他的三分在历史上是独一档的。　　欧文：他的运球比我风骚。　　詹姆斯：他的追身大帽，…</p>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<div th:replace="mobile/common/footer::tabbar(0)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+</body>
+</html>

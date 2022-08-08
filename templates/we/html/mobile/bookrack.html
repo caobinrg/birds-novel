@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书架_' + webSiteName},
+    keywords=${'书架,' + webSiteKeywords},
+    description=${'书架,'+webSiteDescription})">
+    </head>
+
+</head>
+<body>
+<div>
+    书架
+
+
+</div>
+
+<div th:replace="mobile/common/footer::tabbar(1)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+
+<script th:inline="javascript">
+
+</script>
+</body>
+
+</html>

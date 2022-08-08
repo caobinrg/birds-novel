@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'用户_' + webSiteName},
+    keywords=${'用户,' + webSiteKeywords},
+    description=${'用户,'+webSiteDescription})">
+    </head>
+
+</head>
+<body>
+<div>
+    我的
+</div>
+
+<div th:replace="mobile/common/footer::tabbar(2)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+
+<script th:inline="javascript">
+
+</script>
+</body>
+
+
+</html>
