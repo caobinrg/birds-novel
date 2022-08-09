@@ -96,6 +96,10 @@ public class ContentService {
                 //找到章节内容
                 contentOutDto = EntityToDtoUtil.parseDataWithUrl(content,contentOutDto);
                 contentOutDto.setHasDataFlag(true);
+                String contentText = content.getContentText();
+                if(contentText.contains("重新刷新页面")){
+                    jobRemoteService.jumpGetContentAsync(chapter);
+                }
             }else{
                 //未找到章节内容
                 if(null != chapter && StrUtil.isNotBlank(chapter.getChapterName())){

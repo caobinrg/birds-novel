@@ -40,30 +40,30 @@ public class BirdsTaskTest {
     }
     @Test
     public void TestInfo() throws JMException, InterruptedException {
-        Request request = new Request("https://www.xbiquge.la/90/9072111111/");
-        CrawlerRequestDto requestInfo = CrawlerRequestDto.builder()
-                .url("https://www.xbiquge.la/90/90721/")
-                .ruleId("3dccc9aa30004cb999466fb78aef4e7a")
-                .baseUrl("https://www.xbiquge.la/")
-                .type(CrawlerTypeEnum.DETAIL.getType())
-                .build();
-        request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
-        SpiderStartContainer startContainer = spiderStartContainerFactory.getStartContainer(request);
-        startContainer.addRequest(request);
-        startContainer.spiderStart();
-        TimeUnit.SECONDS.sleep(15);
-        Request request1 = new Request("https://www.xbiquge.la/82/8262222222/");
-        CrawlerRequestDto requestInfo1 = CrawlerRequestDto.builder()
-                .url("https://www.xbiquge.la/82/82622/")
-                .ruleId("3dccc9aa30004cb999466fb78aef4e7a")
-                .baseUrl("https://www.xbiquge.la/")
-                .type(CrawlerTypeEnum.DETAIL.getType())
-                .build();
-        request1.putExtra(RequestConst.REQUEST_INFO,requestInfo1);
-        SpiderStartContainer startContainer1 = spiderStartContainerFactory.getStartContainer(request);
-        startContainer1.addRequest(request1);
-        startContainer1.spiderStart();
-        TimeUnit.SECONDS.sleep(100);
+//        Request request = new Request("https://www.xbiquge.la/90/9072111111/");
+//        CrawlerRequestDto requestInfo = CrawlerRequestDto.builder()
+//                .url("https://www.xbiquge.la/90/90721/")
+//                .ruleId("3dccc9aa30004cb999466fb78aef4e7a")
+//                .baseUrl("https://www.xbiquge.la/")
+//                .type(CrawlerTypeEnum.DETAIL.getType())
+//                .build();
+//        request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
+//        SpiderStartContainer startContainer = spiderStartContainerFactory.getStartContainer(request);
+//        startContainer.addRequest(request);
+//        startContainer.spiderStart();
+//        TimeUnit.SECONDS.sleep(15);
+//        Request request1 = new Request("https://www.xbiquge.la/82/8262222222/");
+//        CrawlerRequestDto requestInfo1 = CrawlerRequestDto.builder()
+//                .url("https://www.xbiquge.la/82/82622/")
+//                .ruleId("3dccc9aa30004cb999466fb78aef4e7a")
+//                .baseUrl("https://www.xbiquge.la/")
+//                .type(CrawlerTypeEnum.DETAIL.getType())
+//                .build();
+//        request1.putExtra(RequestConst.REQUEST_INFO,requestInfo1);
+//        SpiderStartContainer startContainer1 = spiderStartContainerFactory.getStartContainer(request);
+//        startContainer1.addRequest(request1);
+//        startContainer1.spiderStart();
+//        TimeUnit.SECONDS.sleep(100);
 //        Request request1 = new Request("https://www.xbiquge.la/90/90721/");
 //        CrawlerRequestDto requestInfo1 = CrawlerRequestDto.builder()
 //                .url("https://www.xbiquge.la/90/90721/")
@@ -75,6 +75,19 @@ public class BirdsTaskTest {
 //        spiderStartContainer.addRequest(request1);
 //        SpiderMonitor spiderMonitor = SpiderMonitor.instance();
 //        spiderMonitor.register(spiderStartContainer);
+
+        Request request1 = new Request("https://www.xbiquge.la/103/103101/39706691.html");
+        CrawlerRequestDto requestInfo1 = CrawlerRequestDto.builder()
+                .url("https://www.xbiquge.la/103/103101/39706691.html")
+                .ruleId("3dccc9aa30004cb999466fb78aef4e7a")
+                .baseUrl("https://www.xbiquge.la/")
+                .type(CrawlerTypeEnum.CONTENT.getType())
+                .build();
+        request1.putExtra(RequestConst.REQUEST_INFO,requestInfo1);
+        SpiderStartContainer startContainer1 = spiderStartContainerFactory.getStartContainer(request1);
+        startContainer1.addRequest(request1);
+        startContainer1.spiderStart();
+        Thread.sleep(100000);
     }
 
     @Autowired

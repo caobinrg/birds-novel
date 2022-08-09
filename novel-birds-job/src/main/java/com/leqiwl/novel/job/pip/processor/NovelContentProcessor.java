@@ -40,7 +40,7 @@ public class NovelContentProcessor implements NovelProcessor{
         String chapterId = requestInfo.getChapterId();
         String novelId = requestInfo.getNovelId();
         Content content = contentService.getByNovelAndChapterId(novelId,chapterId);
-        if(StrUtil.isNotBlank(content.getNovelId())){
+        if(StrUtil.isNotBlank(content.getNovelId()) && !requestInfo.isRetry()){
             page.setSkip(true);
             return;
         }
