@@ -60,6 +60,10 @@ public class NovelContentProcessor implements NovelProcessor{
                 contentText = contentText.replace(contentOutStr,"");
             }
         }
+        String id = "";
+        if(null != content){
+            id  = content.getId();
+        }
         content= Content.builder()
                 .novelId(requestInfo.getNovelId())
                 .novelName(requestInfo.getNovelName())
@@ -68,6 +72,9 @@ public class NovelContentProcessor implements NovelProcessor{
                 .contentText(contentText)
                 .relUrl(requestInfo.getUrl())
                 .build();
+        if(StrUtil.isNotBlank(id)){
+            content.setId(id);
+        }
         //章节内容持久化
         page.putField(CrawlerSaveTypeEnum.CONTENT.getType().toString(), content);
     }
