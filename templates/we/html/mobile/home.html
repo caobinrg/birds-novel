@@ -86,17 +86,18 @@
         </div>
     </div>
 
-    <!--/*@thymesVar id="novels" type=""*/-->
-    <!--/*@thymesVar id="shortage" type=""*/-->
-    <div class="weui-grids"  th:each="novelSetOutDto:${novels.shortage}">
-        <a th:href="${novelSetOutDto.novelUrl}" class="grid">
-            <div class="weui-grid__icon">
-                <img th:src="${novelSetOutDto.image}" alt="">
-            </div>
-            <p class="weui-grid__label">
-               [[${novelSetOutDto.name}]]
-            </p>
-        </a>
+
+    <div class="weui-grids"  >
+        <div th:each="novelSetOutDto:${novels.shortage}">
+            <a th:href="${novelSetOutDto.novelUrl}" class="grid">
+                <div class="weui-grid__icon">
+                    <img th:src="${novelSetOutDto.image}" alt="">
+                </div>
+                <p class="weui-grid__label">
+                    [[${novelSetOutDto.name}]]
+                </p>
+            </a>
+        </div>
     </div>
 
     <div class="weui-cell">
