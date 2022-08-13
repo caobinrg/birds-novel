@@ -218,8 +218,11 @@
                 <p class="weui-tabbar__label">加入书架</p>
             </a>
         </div>
-
     </div>
+
+    <div th:replace="mobile/common/login::login"></div>
+
+
 </div>
 
 </body>
@@ -264,23 +267,27 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function (res) {
+                    $.hideLoading();
                     if(res==undefined){
                         $.toast("出错了", "cancel");
                         return
                     }
-                    // if(res.success != true && res.errorCode == 10001){
-                    //     $.toast("需要登录",'text');
-                    //     return;
-                    // }
-                    // if(res.success != true){
-                    //     $.toast("出错了", "cancel");
-                    //     return;
-                    // }
+                    if(res.success != true && res.errorCode == 10001){
+                        login();
+                        return;
+                    }
+                    if(res.success != true){
+                        $.toast("出错了", "cancel");
+                        return;
+                    }
                     //收藏成功
-                    $.toast("收藏成功");
                     startValue = true;
+                    $.toast("收藏成功");
                     $('#star').removeClass('icon-49').addClass('icon-48');
 
+                },
+                error: function () {
+                    $.toast("出错了", "cancel");
                 }
             });
         }else{
@@ -292,25 +299,33 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function (res) {
+                    $.hideLoading();
                     if(res==undefined){
                         $.toast("出错了", "cancel");
                         return;
                     }
-                    // if(res.success != true && res.errorCode == 10001){
-                    //     $.toast("需要登录",'text');
-                    //     return;
-                    // }
-                    // if(res.success != true){
-                    //     $.toast("出错了", "cancel");
-                    //     return;
-                    // }
+                    if(res.success != true && res.errorCode == 10001){
+                        $("#loginView").popup();
+                        return;
+                    }
+                    if(res.success != true){
+                        $.toast("出错了", "cancel");
+                        return;
+                    }
+                    startValue = false;
                     $.toast("取消收藏成功");
                     $('#star').removeClass('icon-48').addClass('icon-49');
-                    startValue = false;
-
+                },
+                error: function () {
+                    $.toast("出错了", "cancel");
                 }
             });
         }
     }
+
+    function login() {
+        $("#loginView").popup();
+    }
+
 </script>
 </html>
