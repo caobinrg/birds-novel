@@ -9,298 +9,308 @@
     ${novel.description})">
         <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
     </head>
-    <style scoped>
-
-        [v-cloak]{
-            display: none;
+    <script th:src="@{/static/mobile/js/sidebar.js}"></script>
+    <style >
+        .weui-news-list{
+            background-color: #81868c !important;
+        }
+        .weui-news-text{
+            position: absolute;
+            bottom: 10px;
+        }
+        .page-hd-title{
+            color: #FFFFFF;
+        }
+        .weui-news-title{
+            font-size: 14px;
+            color: #D4D0D0;
+        }
+        .weui-news-media img{
+            border-radius: 5px;
+        }
+        .grid .icon{
+            font-size: 24px;
+            line-height: 40px;
+            margin: 5px 0;
+            color: #323233;
+            -webkit-transition: font-size 0.5s ease-out 0s;
+            -moz-transition: font-size 0.5s ease-out 0s;
+            transition: font-size 0.5s ease-out 0s;
+        }
+        .grid p{
+            margin-top: 10px !important;
+        }
+        .weui-grids a{
+            border: #f6f6f6  1px solid;
+        }
+        .weui-navbar{
+            background-color: white;
+        }
+        .weui-tab-content{
+            margin-top: 53px;
+        }
+        .weui-tab-content p{
+            font-size: 16px;
+        }
+        .weui-content{
+            padding-top: 5px;
+        }
+        * { touch-action: pan-y; }
+        .weui-navs a {
+            line-height: 20px;
+        }
+        .navs-cell p {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+        .navs-cells{
+            margin-top: 0;
+            overflow: auto;
+        }
+        .weui-tabbar{
+            background-color: white;
+        }
+        .book-content{
+            padding-bottom: 4em;
+        }
+        .weui-tabbar__item{
+            color: #999999 !important;
         }
     </style>
 </head>
 <body>
-<div id="app" v-cloak>
-    <van-nav-bar :title="novel.name" left-text="返回" left-arrow @click-left="onClickLeft">
-    </van-nav-bar>
-    <van-skeleton title avatar :row="3" :loading="false">
-        <div class="book_content">
-            <div class="head">
-                <div class="left">
-                    <h3>{{novel.name}}</h3>
-                    <p> {{novel.author}}</p>
-                    <p class="info"> {{novel.novelType}}·{{novel.updateStatus}}·{{novel.wordNum}}万字</p>
+<div class="book-content">
+
+    <div class="weui-header bg-white">
+        <div class="weui-header-left"> <a class="icon icon-109 f-green" onclick="history.back(-1);">返回</a>  </div>
+        <h1 class="weui-header-title f-black" th:text="${novel.name}"></h1>
+    </div>
+    <div class="weui-news" >
+        <ul class="weui-news-list">
+            <li class="weui-news-item">
+                <div class="weui-news-inner">
+                    <div class="weui-news-inners">
+                        <div>
+                            <h1 class="page-hd-title" th:text="${novel.name}"></h1>
+                        </div>
+                        <div class="weui-news-info">
+                            <div class="weui-news-infoitem">
+                                <div class="weui-news-title" th:text="${novel.author}"></div>
+<!--                                <span class="weui-news-left" ></span>-->
+                            </div>
+                        </div>
+                        <div class="weui-news-text">
+                            <div  class="weui-news-title novel-info" th:text="${novel.novelType}+ ' · '
+                            + ${{novel.updateStatus}} +
+                             ' · ' + ${novel.wordNum} + '万字' "></div>
+                        </div>
+                    </div>
+                    <div class="weui-news-media">
+                        <img th:src="${novel.image}" alt="">
+                    </div>
                 </div>
-                <div class="right">
-                    <img :src="novel.image">
+            </li>
+        </ul>
+    </div>
+
+    <div class="weui-grids"  >
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-65"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'评分 ' + ${novel.score}">
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-62"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'热度 ' +
+            ${#numbers.formatInteger( (novel.score ?: 1) , 0)} *
+            ${#numbers.formatInteger( (novel.scorePersonNum ?: 1) , 0)}
+            ">
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-49"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'收藏 ' + ${novel.scorePersonNum}">
+            </p>
+        </a>
+    </div>
+
+
+
+    <div class="weui-tab">
+        <div class="weui-navbar">
+            <div class="weui-navbar__item">
+                简介
+            </div>
+            <div class="weui-navbar__item">
+                目录
+            </div>
+        </div>
+    </div>
+
+    <div class="weui-tab-content">
+        <div class="weui-tab-content-item">
+            <div class="weui-content">
+                <div class="weui-c-inner">
+                    <div class="weui-c-content">
+                        <div class="weui-c-article">
+                            <p th:utext="${novel.intro}"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </van-skeleton>
 
-    <van-grid :column-num="2">
-        <van-grid-item icon="like-o" :text="'评分 ' + novel.score"></van-grid-item>
-        <van-grid-item icon="star-o" :text="'收藏 ' + novel.scorePersonNum" ></van-grid-item>
-    </van-grid>
+        <div class="weui-tab-content-item">
+            <div class="weui-cells" >
+                <a class="weui-cell weui-cell_access" th:href="${chapter.chapterUrl}" th:each="chapter : ${novel.chapterList}">
+                    <div class="weui-cell__bd">
+                        <p th:text="${chapter.chapterName}">京东</p>
+                    </div>
+                    <div class="weui-cell__ft">
+                    </div>
+                </a>
+                <div class="weui-cell weui-cell_access" navbar-toggle>
+                    <div class="weui-cell__bd">
 
-    <van-tabs v-model="active" animated>
-        <van-tab title="简介" :style="{height:'280px'}">
-            <van-field
-                    v-model="novel.intro"
-                    type="textarea"
-                    autosize
-                    readonly />
-        </van-tab>
-        <van-tab title="目录" :style="{height:'280px'}">
-            <van-cell :title="chapter.chapterName" v-for="chapter in novel.chapterList" is-link :url="chapter.chapterUrl" ></van-cell>
-            <van-cell icon="orders-o" title="查看完整章节目录" is-link @click="clickAllChapter"></van-cell>
-        </van-tab>
-    </van-tabs>
-
-    <van-popup v-model:show="show" position="left" :close-on-popstate="true" :style="{ width: '75%' ,height: '100%' }">
-        <van-cell-group v-for="chapter in allChapter">
-            <van-cell :title="chapter.chapterName" is-link :url="chapter.chapterUrl"/>
-        </van-cell-group>
-    </van-popup>
-
-    <van-tabbar active-color="#7d7e80" inactive-color="#7d7e80">
-        <van-tabbar-item  icon="home-o" replace @click="clickHome">返回首页</van-tabbar-item>
-        <van-tabbar-item v-if="isFirst"  icon="play-circle-o"  :url="chapterUrl">开始阅读</van-tabbar-item>
-        <van-tabbar-item v-else icon="play-circle-o" :url="chapterUrl">继续阅读</van-tabbar-item>
-        <van-tabbar-item>
-           <div style="font-size: 12px;line-height: 1;cursor: pointer;color: rgb(125, 126, 128);">加入书架</div>
-            <template #icon>
-                <van-icon v-if="starValue" name="star" size="22" color="#ffd21e" @click="starClick()"></van-icon>
-                <van-icon v-else name="star-o" size="22" @click="starClick()"></van-icon>
-            </template>
-        </van-tabbar-item>
-    </van-tabbar>
-
-
-    <van-popup v-model:show="userLoginShow" position="bottom" :close-on-popstate="true" :closeable="true"
-               :style="{ width: '100%' ,height: '100%', 'background-color':'#f7f8fa' }">
-        <van-nav-bar title="登录"></van-nav-bar>
-        <van-form style="margin: 40px 15px 0 15px">
-            <van-field
-                    v-model="username"
-                    name="账号"
-                    label="账号"
-                    placeholder="账号"
-                    :rules="[{ required: true, message: '请填写账号' }]"
-            ></van-field>
-            <van-field
-                    v-model="password"
-                    :type="isPassword"
-                    name="密码"
-                    label="密码"
-                    placeholder="密码"
-                    :rules="[{ required: true, message: '请填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
-            >
-                <template #right-icon>
-                    <van-icon name="eye-o" @click="isPasswordChange"/>
-                </template>
-            </van-field>
-            <van-field
-                    v-if="isRegister"
-                    v-model="confirmPassword"
-                    :type="isPassword"
-                    name="密码确认"
-                    label="密码确认"
-                    placeholder="密码确认"
-                    :rules="[{ required: true, message: '请再次填写密码' },{pattern: /^\w{6,}$/,message:'密码不少于6位'}]"
-            >
-                <template #right-icon>
-                    <van-icon name="eye-o" @click="isPasswordChange"/>
-                </template>
-            </van-field>
-            <div>
-                <div style="margin: 16px;">
-                    <van-button round block type="primary" native-type="submit" @click="onSubmit">
-                        {{subButtonText}}
-                    </van-button>
-                </div>
-                <div style="text-align:center;" >
-                    <div @click="toRegister">没有账号？立即注册</div>
+                        <p><i class="icon  icon-81"></i>&nbsp;查看完整目录</p>
+                    </div>
+                    <div class="weui-cell__ft">
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-        </van-form>
-    </van-popup>
+    <div class="weui-navs" navbar >
+        <div class="weui-cells navs-cells" id="chapterView">
+
+        </div>
+    </div>
+    <script id="chapterViewTpl" type="text/html">
+        {{#each allChapter}}
+        <a class="weui-cell weui-cell_access navs-cell" href="{{chapterUrl}}">
+            <div class="weui-cell__bd">
+                <p>{{chapterName}}</p>
+            </div>
+        </a>
+        {{/each}}
+    </script>
+
+
+    <div id="tb">
+        <div class="weui-tabbar tab-bottom">
+            <a href="/web/home" class="weui-tabbar__item">
+                <i class="icon icon-27 f27 weui-tabbar__icon"></i>
+                <p class="weui-tabbar__label">书城</p>
+            </a>
+            <a href="${chapterUrl}" class="weui-tabbar__item">
+                <i class="icon icon-92 f27 weui-tabbar__icon"></i>
+                <p class="weui-tabbar__label" th:text="${isFirst?'开始阅读':'继续阅读'}"></p>
+            </a>
+            <a class="weui-tabbar__item " onclick="starClick()">
+                <i id="star" th:class="'icon f27 weui-tabbar__icon' + ${isStar ? 'icon icon-48' : 'icon icon-49'}"></i>
+                <p class="weui-tabbar__label">加入书架</p>
+            </a>
+        </div>
+
+    </div>
 </div>
+
 </body>
 <script th:inline="javascript">
-    const app = Vue.createApp({
-        data:()=>({
-            active:0,
-            show: false,
-            userLoginShow:false,
-            starValue: [[ ${isStar} ]],
-            novel: [[${novel}]],
-            chapterId:[[${chapterId}]],
-            isFirst:[[${isFirst}]],
-            allChapter: [],
-            chapterUrl: [[${chapterUrl}]],
-            username:"",
-            password:"",
-            confirmPassword:"",
-            isPassword:"password",
-            isRegister:false,
-            subButtonText:"登录",
-            isRegisterText:"没有账号？立即注册"
-        }),
-        created:function(){
-            var self = this;
-            $.ajax({
-                url: '/api/novel/getChapter',
-                type: 'post',
-                data: JSON.stringify({"novelId": [[${novel.novelId}]]}),
-                contentType: 'application/json',
-            }).then(function (res) {
-                if(res!=undefined && res.success == true){
-                    self.allChapter =  res.data
+    $('.weui-tab').tab({
+        defaultIndex: 0,
+        activeClass: 'tab-green',
+        onToggle: function (index) {
+            var tabContents = $(".weui-tab-content").children();
+            $.each(tabContents,function (itemIndex,item) {
+                if(itemIndex === index){
+                    $(item).show();
+                    return true;
                 }
-                vant.Toast.clear();
-            }).fail(function () {
-                vant.Toast.clear();
+                $(item).hide();
             });
-        },
-        methods:{
-            clickAllChapter(){
-                vant.Toast.loading({
-                    message: '章节获取中...',
-                    forbidClick: true,
-                    loadingType: 'spinner',
-                });
-                if(this.allChapter.length > 0){
-                    vant.Toast.clear();
-                }
-                this.show = true;
-            },
-            onClickLeft(){
-                history.back(-1);
-            },
-            clickHome(){
-                window.location.replace("/");
-            },
-            starClick(){
-                if(!this.starValue){
-                    //收藏
-                    var self = this;
-                    $.ajax({
-                        url: '/api/user/bookStar',
-                        type: 'post',
-                        data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                    }).then(function (res) {
-                        if(res==undefined){
-                            vant.Toast("出错了")
-                            return
-                        }
-                        if(res.success != true && res.errorCode == 10001){
-                            self.userLoginShow = true;
-                            return
-                        }
-                        if(res.success != true){
-                            vant.Toast(res.msg)
-                            return;
-                        }
-                        self.starValue = true;
-                        vant.Toast("收藏成功")
-                    }).fail(function () {
-                        vant.Toast("出错了")
-                    });
-                }else{
-                    //取消收藏
-                    var self = this;
-                    $.ajax({
-                        url: '/api/user/unBookStar',
-                        type: 'post',
-                        data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
-                        dataType: 'json',
-                        contentType: 'application/json',
-                    }).then(function (res) {
-                        if(res==undefined){
-                            vant.Toast("出错了")
-                            return
-                        }
-                        if(res.success != true && res.errorCode == 10001){
-                            self.userLoginShow = true;
-
-                            return
-                        }
-                        if(res.success != true){
-                            vant.Toast(res.msg)
-                            return;
-                        }
-                        self.starValue = false;
-                        vant.Toast("取消收藏成功")
-                    }).fail(function () {
-                        vant.Toast("出错了")
-                    });
-                }
-
-            },
-            isPasswordChange:function () {
-                if(this.isPassword == "password"){
-                    this.isPassword = "text"
-                }else{
-                    this.isPassword = "password"
-                }
-            },
-            toRegister:function () {
-                if(!this.isRegister){
-                    this.isRegister = true
-                    this.subButtonText = "注册"
-                    this.isRegisterText = "已有账号？请登录"
-                }else{
-                    this.isRegister = false
-                    this.subButtonText = "登录"
-                    this.isRegisterText = "没有账号？立即注册"
-                }
-            },
-            onSubmit:function () {
-               if(this.isRegister){
-                   //注册
-                   if(this.password == "" || this.confirmPassword == "" || this.password != this.confirmPassword ){
-                       vant.Toast("请确认两次密码输入是否一致")
-                   }
-                   var self = this;
-                   $.ajax({
-                       url: '/api/user/register',
-                       type: 'post',
-                       data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
-                       dataType: 'json',
-                       contentType: 'application/json',
-                   }).then(function (res) {
-                        if(res!=undefined && res.success == true){
-                            vant.Toast("注册成功")
-                            self.userLoginShow = false;
-                        }else{
-                            vant.Toast(res.msg ? res.msg : "注册失败")
-                        }
-                   }).fail(function () {
-                       vant.Toast("注册失败！")
-                   });
-               }else{
-                   var self = this;
-                   $.ajax({
-                       url: '/api/user/login',
-                       type: 'post',
-                       data: JSON.stringify({"userName":self.username,"userPassword":self.password}),
-                       dataType: 'json',
-                       contentType: 'application/json',
-                       async:false,
-                   }).then(function (res) {
-                       if(res!=undefined && res.success == true){
-                           vant.Toast("登录成功")
-                           self.userLoginShow = false;
-                       }else{
-                           vant.Toast(res.msg ? res.msg : "登录失败")
-                       }
-                   }).fail(function () {
-                       vant.Toast("登录失败！")
-                   });
-               }
-            }
         }
-    }).use(vant).mount("#app")
+    });
+    $(function(){
+        $.ajax({
+            url: '/api/novel/getChapter',
+            type: 'post',
+            data: JSON.stringify({"novelId": [[${novel.novelId}]]}),
+            contentType: 'application/json',
+            success: function(res){
+                if(res!=undefined && res.success == true){
+                    var allChapter =  res.data;
+                    var comtpl = $.t7.compile($('#chapterViewTpl').html());
+                   $('#chapterView').html(comtpl({"allChapter":allChapter}));
+                }
+            }
+        });
+    });
+    var sidebarjs = new SidebarJS('navbar');
+    var startValue = [[ ${isStar} ]];
+    function starClick(){
+        if(!startValue){
+            $.ajax({
+                url: '/api/user/bookStar',
+                type: 'post',
+                data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId": [[${chapterId}]] }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (res) {
+                    if(res==undefined){
+                        $.toast("出错了", "cancel");
+                        return
+                    }
+                    // if(res.success != true && res.errorCode == 10001){
+                    //     $.toast("需要登录",'text');
+                    //     return;
+                    // }
+                    // if(res.success != true){
+                    //     $.toast("出错了", "cancel");
+                    //     return;
+                    // }
+                    //收藏成功
+                    $.toast("收藏成功");
+                    startValue = true;
+                    $('#star').removeClass('icon-49').addClass('icon-48');
+
+                }
+            });
+        }else{
+            //取消收藏
+            $.ajax({
+                url: '/api/user/unBookStar',
+                type: 'post',
+                data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (res) {
+                    if(res==undefined){
+                        $.toast("出错了", "cancel");
+                        return;
+                    }
+                    // if(res.success != true && res.errorCode == 10001){
+                    //     $.toast("需要登录",'text');
+                    //     return;
+                    // }
+                    // if(res.success != true){
+                    //     $.toast("出错了", "cancel");
+                    //     return;
+                    // }
+                    $.toast("取消收藏成功");
+                    $('#star').removeClass('icon-48').addClass('icon-49');
+                    startValue = false;
+
+                }
+            });
+        }
+    }
 </script>
 </html>

@@ -51,6 +51,9 @@
             line-height: 60px;
             text-align: center;
         }
+        .weui-tabbar{
+            background-color: white;
+        }
     </style>
 </head>
 <body>
@@ -117,7 +120,9 @@
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
-                <p class="weui-media-box__desc">[[${#strings.isEmpty(novelSetOutDto.intro)} ? 暂无描述 : ${novelSetOutDto.intro} ]]</p>
+                <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelSetOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelSetOutDto.intro,'<br/>','')}"></p>
                 <p class="page-hd-desc">[[${novelSetOutDto.author}]]</p>
             </div>
         </a>
