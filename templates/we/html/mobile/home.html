@@ -82,7 +82,7 @@
             &nbsp;书荒推荐
         </div>
         <div class="weui-cell__ft">
-            <div>
+            <div onclick="recommendChange()">
                 <i class="icon icon-21 f25 weui-tabbar__icon" ></i>
                 <span>换一换</span>
             </div>
@@ -91,8 +91,8 @@
 
 
     <div class="weui-grids"  >
-        <div th:each="novelSetOutDto:${novels.shortage}">
-            <a th:href="${novelSetOutDto.novelUrl}" class="grid">
+        <div id="storageView">
+            <a th:href="${novelSetOutDto.novelUrl}" th:each="novelSetOutDto:${novels.shortage}" class="grid">
                 <div class="weui-grid__icon">
                     <img th:src="${novelSetOutDto.image}" alt="">
                 </div>
@@ -102,6 +102,24 @@
             </a>
         </div>
     </div>
+
+
+
+    <script id="storageViewTpl" type="text/html">
+        {{#each shortage}}
+        <a href="{{novelUrl}}"  class="grid">
+            <div class="weui-grid__icon">
+                <img src="{{image}}" alt="">
+            </div>
+            <p class="weui-grid__label">
+                {{name}}
+            </p>
+        </a>
+        {{/each}}
+    </script>
+
+
+
 
     <div class="weui-cell">
         <div class="weui-cell__hd">
@@ -159,6 +177,25 @@
 </body>
 
 <script th:inline="javascript">
+    function recommendChange() {
+        $.ajax({
+            url: '/api/novel/shortage',
+            type: 'post',
+            data: {},
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (res) {
+                if(res!=undefined && res.success == true){
+                    let shortage =  res.data;
+                    let comtpl = $.t7.compile($('#storageViewTpl').html());
+                    $('#storageView').html(comtpl({"shortage":shortage}));
+                }
+            },
+            error: function () {
+               $.toastFast("出错了","text")
+            }
+        });
+    }
 
 
 </script>
