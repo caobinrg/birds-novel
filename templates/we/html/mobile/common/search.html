@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+
+<div th:fragment="search">
+        <div id="searchView" class='weui-popup__container'>
+            <div class="weui-popup__overlay"></div>
+            <div class="weui-popup__modal" style="background-color: white">
+                <div class="weui-search-bar" style="background-color: white">
+                    <input type="search" class="search-input" id='searchInputInner' placeholder='书名'/>
+                    <button id="searchBtn"  class="weui-btn weui-btn_mini weui-btn_primary" onclick="searchBtnClick()"><i class="icon icon-4" ></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function startSearch(searchInputVal){
+            $.ajax({
+                url: '/api/novel/searchNovelByNovelName',
+                type: 'post',
+                data: JSON.stringify({"pageNo":self.searchPageNo,
+                    "pageSize":self.searchPageSize,
+                    "novelName":searchInputVal}),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function () {
+                    if(res!=undefined && res.success == true){
+                        var searchData = res.data
+                        // self.searchTotal = searchData.total
+                        // self.searchResult = searchData.data
+                    }
+                },
+                error(err) {
+                    $.toastFast("出错了","text")
+                }
+            });
+        }
+
+
+    </script>
+</div>
+
+
+</body>
+</html>
