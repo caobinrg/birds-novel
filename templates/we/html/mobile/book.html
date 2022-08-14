@@ -170,14 +170,13 @@
             <div class="weui-cells" >
                 <a class="weui-cell weui-cell_access" th:href="${chapter.chapterUrl}" th:each="chapter : ${novel.chapterList}">
                     <div class="weui-cell__bd">
-                        <p th:text="${chapter.chapterName}">京东</p>
+                        <p th:text="${chapter.chapterName}"></p>
                     </div>
                     <div class="weui-cell__ft">
                     </div>
                 </a>
                 <div class="weui-cell weui-cell_access" navbar-toggle>
                     <div class="weui-cell__bd">
-
                         <p><i class="icon  icon-81"></i>&nbsp;查看完整目录</p>
                     </div>
                     <div class="weui-cell__ft">
@@ -203,24 +202,24 @@
     </script>
 
 
-    <div id="tb">
+    <div id="book-tb">
         <div class="weui-tabbar tab-bottom">
-            <a href="/web/home" class="weui-tabbar__item">
+            <a th:href="${webBaseUrlConfig.home}" class="weui-tabbar__item">
                 <i class="icon icon-27 f27 weui-tabbar__icon"></i>
                 <p class="weui-tabbar__label">书城</p>
             </a>
-            <a href="${chapterUrl}" class="weui-tabbar__item">
+            <a th:href="${chapterUrl}" class="weui-tabbar__item">
                 <i class="icon icon-92 f27 weui-tabbar__icon"></i>
                 <p class="weui-tabbar__label" th:text="${isFirst?'开始阅读':'继续阅读'}"></p>
             </a>
             <a class="weui-tabbar__item " onclick="starClick()">
-                <i id="star" th:class="'icon f27 weui-tabbar__icon' + ${isStar ? 'icon icon-48' : 'icon icon-49'}"></i>
+                <i id="star" th:class="'icon f27 weui-tabbar__icon ' + ${isStar ? 'icon icon-48' : 'icon icon-49'}"></i>
                 <p class="weui-tabbar__label">加入书架</p>
             </a>
         </div>
     </div>
 
-    <div th:replace="mobile/common/login::login"></div>
+    <div th:replace="mobile/common/login::login(true)"></div>
 
 
 </div>
@@ -269,7 +268,7 @@
                 success: function (res) {
                     $.hideLoading();
                     if(res==undefined){
-                        $.toast("出错了", "cancel");
+                        $.toastFast("出错了", "cancel");
                         return
                     }
                     if(res.success != true && res.errorCode == 10001){
@@ -277,17 +276,17 @@
                         return;
                     }
                     if(res.success != true){
-                        $.toast("出错了", "cancel");
+                        $.toastFast("出错了", "cancel");
                         return;
                     }
                     //收藏成功
                     startValue = true;
-                    $.toast("收藏成功");
+                    $.toastFast("收藏成功");
                     $('#star').removeClass('icon-49').addClass('icon-48');
 
                 },
                 error: function () {
-                    $.toast("出错了", "cancel");
+                    $.toastFast("出错了", "cancel");
                 }
             });
         }else{
@@ -301,31 +300,37 @@
                 success: function (res) {
                     $.hideLoading();
                     if(res==undefined){
-                        $.toast("出错了", "cancel");
+                        $.toastFast("出错了", "cancel");
                         return;
                     }
                     if(res.success != true && res.errorCode == 10001){
-                        $("#loginView").popup();
+                        login();
                         return;
                     }
                     if(res.success != true){
-                        $.toast("出错了", "cancel");
+                        $.toastFast("出错了", "cancel");
                         return;
                     }
                     startValue = false;
-                    $.toast("取消收藏成功");
+                    $.toastFast("取消收藏成功");
                     $('#star').removeClass('icon-48').addClass('icon-49');
                 },
                 error: function () {
-                    $.toast("出错了", "cancel");
+                    $.toastFast("出错了", "cancel");
                 }
             });
         }
     }
 
     function login() {
+        $('#book-tb').hide();
         $("#loginView").popup();
     }
+
+    function loginPopClose() {
+        $('#book-tb').show()
+    }
+
 
 </script>
 </html>

@@ -900,6 +900,7 @@
     }
 
     $.toast = function(text, style, callback) {
+        console.log(text);
         if(typeof style === "function") {
             callback = style;
         }
@@ -922,6 +923,33 @@
             hide(callback);
         }, duration);
     }
+
+
+    $.toastFast = function(text, style, durationTime) {
+        console.log(text);
+        var className, iconClassName = 'weui-icon-success-no-circle';
+        var duration = 300;
+        if(durationTime){
+            duration = durationTime;
+        }
+        if(style == "cancel") {
+            className = "weui-toast_cancel";
+            iconClassName = 'weui-icon-cancel'
+        } else if(style == "forbidden") {
+            className = "weui-toast--forbidden";
+            iconClassName = 'weui-icon-warn'
+        } else if(style == "text") {
+            className = "weui-toast--text";
+        } else if(typeof style === typeof 1) {
+            duration = style
+        }
+        show('<i class="' + iconClassName + ' weui-icon_toast"></i><p class="weui-toast_content">' + (text || "已经完成") + '</p>', className);
+
+        setTimeout(function() {
+            hide();
+        }, duration);
+    }
+
 
     $.showLoading = function(text) {
         var html = '<div class="weui_loading">';

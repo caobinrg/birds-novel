@@ -9,15 +9,15 @@
     <div th:fragment="tabbar(index)">
         <div id="tb">
             <div class="weui-tabbar tab-bottom">
-                <a href="/web/home" class="weui-tabbar__item">
+                <a th:href="${webBaseUrlConfig.home}" class="weui-tabbar__item">
                     <i class="icon icon-27 f27 weui-tabbar__icon"></i>
                     <p class="weui-tabbar__label">书城</p>
                 </a>
-                <a href="/web/bookrack" class="weui-tabbar__item">
+                <a th:href="${webBaseUrlConfig.bookrack}" class="weui-tabbar__item">
                     <i class="icon icon-93 f27 weui-tabbar__icon"></i>
                     <p class="weui-tabbar__label">书架</p>
                 </a>
-                <a href="/web/user" class="weui-tabbar__item ">
+                <a th:href="${webBaseUrlConfig.user}" class="weui-tabbar__item ">
                     <i class="icon icon-85 f27 weui-tabbar__icon" ></i>
                     <p class="weui-tabbar__label">我的</p>
                 </a>
@@ -32,15 +32,6 @@
                 })
             })
         </script>
-        <style>
-            /*.weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon,*/
-            /*.weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon > i,*/
-            /*.weui-tabbar__item.weui-bar__item_on .weui-tabbar__label*/
-            /*{*/
-            /*    color:#10AEFF;*/
-            /*}*/
-
-        </style>
 
     </div>
 
