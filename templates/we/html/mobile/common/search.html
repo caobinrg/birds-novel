@@ -112,13 +112,11 @@
                 pageHtml += "<a class='pager2-next' href='javascript:" + (pageNo == totalPage ? "void(0)" : ("startSearch(" + (pageNo + 1) + ")")) + ";'>&gt;</a>";
                 $("#pager").html(pageHtml);
             }
-            
-            function searchBack() {
-                $.closePopup();
-            }
             var isSearchPop = false;
             $(document).on("open", ".weui-popup__modal", function() {
                 isSearchPop = true;
+                window.history.pushState('forward', null, '#search');
+                window.history.forward(1);
                 if(typeof searchPopUp != 'undefined' && $.isFunction(searchPopUp)){
                     searchPopUp();
                 }
@@ -126,6 +124,21 @@
                 isSearchPop = false;
                 if(typeof searchPopClose != 'undefined' && $.isFunction(searchPopClose)){
                     searchPopClose( $('#searchInputInner').val());
+                }
+            });
+
+            function searchBack(){
+                $.closePopup();
+                history.back(-1);
+            }
+
+            $(function() {
+                if (window.history && window.history.pushState) {
+                    $(window).on('popstate', function () {
+                        if(isSearchPop){
+                            $.closePopup();
+                        }
+                    });
                 }
             });
 

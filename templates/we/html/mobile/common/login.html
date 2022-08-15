@@ -39,7 +39,7 @@
                    <a href="javascript:;" id="registerBtn" class="weui-btn weui-btn_primary" onclick="doRegister()" style="display: none">注册</a>
                    <a href="javascript:;" id="toRegisterBtn" class="weui-btn weui-btn_plain-primary" onclick="toRegisterView()">去注册</a>
                    <a href="javascript:;" id="toLoginBtn" class="weui-btn weui-btn_plain-primary" onclick="toLoginView()" style="display: none">去登录</a>
-                   <a href="javascript:;"  th:if="${hasClouse != false}" class="weui-btn weui-btn_default close-popup">取消</a>
+                   <a href="javascript:;"  th:if="${hasClouse != false}" class="weui-btn weui-btn_default" onclick="closeLoginPop()">取消</a>
                </div>
             </div>
         </div>
@@ -114,6 +114,7 @@
 
             function closeLoginPop() {
                 $.closePopup();
+                history.back(-1);
             }
 
 
@@ -144,6 +145,8 @@
             var isLoginPop = false;
             $(document).on("open", ".weui-popup__modal", function() {
                 isLoginPop = true;
+                window.history.pushState('forward', null, '#login');
+                window.history.forward(1);
                 if(typeof loginPopUp != 'undefined' && $.isFunction(loginPopUp)){
                     loginPopUp();
                 }
@@ -153,6 +156,20 @@
                     loginPopClose();
                 }
             });
+
+            $(function() {
+                if (window.history && window.history.pushState) {
+                    $(window).on('popstate', function () {
+                        if(isLoginPop){
+                            $.closePopup();
+                        }
+                    });
+                }
+            });
+
+
+
+
         </script>
 
 
