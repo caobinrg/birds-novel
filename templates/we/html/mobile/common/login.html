@@ -63,7 +63,7 @@
                     success:function (res) {
                         if(res!=undefined && res.success == true){
                             $.toastFast("登录成功");
-                            $.closePopup();
+                            closeLoginPop();
                             if(typeof loginSuccess != 'undefined' && $.isFunction(loginSuccess)){
                                 loginSuccess(res.data);
                             }
@@ -98,7 +98,7 @@
                     success:function (res) {
                         if(res!=undefined && res.success == true){
                             $.toastFast("注册成功");
-                            $.closePopup();
+                            closeLoginPop();
                             if(typeof registerSuccess != 'undefined' && $.isFunction(registerSuccess)){
                                 registerSuccess(res.data);
                             }
@@ -111,6 +111,11 @@
                     }
                 });
             }
+
+            function closeLoginPop() {
+                $.closePopup();
+            }
+
 
             function toRegisterView() {
                 if(ifLoginView){
@@ -136,17 +141,18 @@
                 $('#username,#password,#confirmPassword').val('');
             }
 
+            var isLoginPop = false;
             $(document).on("open", ".weui-popup__modal", function() {
+                isLoginPop = true;
                 if(typeof loginPopUp != 'undefined' && $.isFunction(loginPopUp)){
                     loginPopUp();
                 }
             }).on("close", ".weui-popup__modal", function() {
+                isLoginPop = false;
                 if(typeof loginPopClose != 'undefined' && $.isFunction(loginPopClose)){
                     loginPopClose();
                 }
             });
-
-
         </script>
 
 

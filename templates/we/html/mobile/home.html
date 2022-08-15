@@ -199,11 +199,17 @@
             $.toastFast("请输入搜索内容","text");
             return
         }
-        $('#searchInputInner').val(searchInputVal);
         $('#tb').hide();
-        $('#searchView').popup();
         unableScroll();
-        startSearch(searchInputVal);
+        $('#searchView').popup();
+        startSearchForOut(searchInputVal);
+    }
+
+
+    function searchPopClose(keyword) {
+        $('#searchInput').val(keyword);
+        enableScroll();
+        $('#tb').show();
     }
 
 
