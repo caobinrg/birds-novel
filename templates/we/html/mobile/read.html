@@ -8,25 +8,209 @@
     keywords=${contentInfo.name+','+contentInfo.novelName},
     description=${contentInfo.name+','+contentInfo.novelName})">
     </head>
-
+    <link rel="stylesheet" th:href="@{/static/mobile/css/layer.css}"/>
+    <script th:src="@{/static/mobile/js/layer.js}"></script>
 
 </head>
 <body>
 <div>
-    <div class="weui-content">
-        <div class="weui-c-inner">
-            <div class="weui-c-content">
-                <h2 class="weui-c-title">Flutter是谷歌的移动UI框架</h2>
-                <div class="weui-c-article">
-                    <p> Flutter是谷歌的移动UI框架 [4]  ，可以快速在iOS和Android上构建高质量的原生用户界面。 Flutter可以与现有的代码一起工作。在全世界，Flutter正在被越来越多的开发者和组织使用，并且Flutter是完全免费、开源的。它也是构建未来的Google Fuchsia [1]  应用的主要方式。</p>
-                </div>
-            </div>
+    <div class="weui-content default fontSize16">
+        <h2 class="weui-c-title" th:text="${contentInfo.name}"></h2>
+        <div th:utext="${contentInfo.contentText}">
         </div>
     </div>
+
+    <div id="setPanel" style="display: none">
+        <div id="setPanelTop" class="setShow" >
+            <div id="tilte" th:text="${contentInfo.name}"></div>
+            <div class="weui-flex turnPage">
+                <div class="weui-flex__item pre"><div class="placeholder" onclick="prePage()">上一页</div></div>
+                <div class="weui-flex__item2"><div class="placeholder "></div></div>
+                <div class="weui-flex__item next"><div class="placeholder" onclick="nextPage()">下一页</div></div>
+             </div>
+            <div id="webSite" th:text="${webSiteName}"></div>
+        </div>
+
+        <div class="setHide"></div>
+        <div id="setPanelBottom" class="setShow">bottom</div>
+    </div>
+
+
 </div>
+<script th:inline="javascript">
+    var contentInfo = [[${contentInfo}]];
+    var isPop = false;
+    $(function () {
+        $('.weui-content').click(function () {
+            if(!isPop){
+                layer.open({
+                    content: $('#setPanel').html()
+                    ,yes: function(index){
+                        layer.open({content: '执行删除操作'})
+                    }
+                    , success: function (ele) {
+                        isPop = true;
+                    }
+                    , end: function(){ //关闭 后回调方法
+                        isPop = false;
+                    }
+                });
+
+            }
+
+        });
+    });
+
+    function prePage(){
+        if(contentInfo.lastChapterUrl == undefined || contentInfo.lastChapterUrl  == ""){
+            $.toastFast("没有上一章了","text");
+        }else{
+            window.location.replace(contentInfo.lastChapterUrl);
+        }
+    }
+    
+    function nextPage() {
+        if(contentInfo.nextChapterUrl == undefined || contentInfo.nextChapterUrl  == ""){
+            $.toastFast("没有下一章了")
+        }else{
+            window.location.replace(contentInfo.nextChapterUrl);
+        }
+    }
+
+
+
+</script>
 </body>
 
+<style>
+    .weui-content{
+        min-height: 95vh;
+    }
+    #tilte{
+        text-align: center;
+        width:100%;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis
+    }
+    #webSite{
+        font-size: 10px;
+        font-weight: bold;
+    }
+    .turnPage{
+        padding: 0 5px;
+    }
 
+    .pre{
+        text-align: left;
+    }
+    .next{
+        text-align: right;
+    }
+    #setPanelBottom{
+        font-size: 16px;
+        border-radius: 5px 5px;
+        padding: 10px;
+        text-align: center;
+        margin: 0;
+    }
+    #setPanelTop{
+        font-size: 8px;
+        border-radius: 5px 5px;
+        padding: 10px;
+        text-align: center;
+        margin: 0 0 0 5px;
+    }
+    .setShow{
+        background-color: rgba(255,255,255,0.9);
+    }
+    .setHide{
+        opacity: 0;
+        background-color: rgba(255,255,255,0);
+        width: 5px;
+        height: 10px;
+    }
+     .layui-m-layermain .layui-m-layerchild{
+         position: fixed;
+         width: 95%;
+         max-width: 100%;
+         margin: 0 auto;
+         left:0;
+         right: 0;
+         bottom: 10px;
+         background: none;
+     }
+    .layui-m-layercont{
+        padding: 0;
+        border-radius: 5px 5px;
+        background-color: rgba(255,255,255,0);}
+
+    .weui-c-title {
+        font-size: 18px;
+        line-height: 1.4;
+        margin-bottom: 14px;
+        font-weight: bold;
+    }
+
+    .default {
+        color: #494c49 !important;
+        background-color: #d5c6ac;
+    }
+
+    .taupe {
+        color: #101020 !important;
+        background-color: #c5a562;
+    }
+
+    .darkBlue {
+        color: #fff6e6 !important;
+        background-color: #415962;
+    }
+
+    .grey {
+        color: #d5cecd !important;
+        background-color: #414441;
+    }
+
+    .dark {
+        color: #b58931 !important;
+        background-color: #081010;
+    }
+
+
+    .fontSize12{
+        line-height: 25px;
+        font-size: 12px;
+    }
+    .fontSize13{
+        line-height: 26px;
+        font-size: 13px;
+    }
+    .fontSize14{
+        line-height: 27px;
+        font-size: 14px;
+    }
+    .fontSize15{
+        line-height: 28px;
+        font-size: 15px;
+    }
+    .fontSize16{
+        line-height: 29px;
+        font-size: 16px !important;
+    }
+    .fontSize17{
+        line-height: 30px;
+        font-size: 17px;
+    }
+    .fontSize18{
+        line-height: 31px;
+        font-size: 18px;
+    }
+
+
+
+
+</style>
 
 
 
