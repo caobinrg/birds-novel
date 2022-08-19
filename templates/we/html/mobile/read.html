@@ -245,37 +245,48 @@
     $('#getmore').on('click', function(e) {
         e.stopPropagation();
         if(hasMoreFlag) {
-            $.ajax({
-                url: '/api/novel/contentInfo',
-                type: 'post',
-                data: JSON.stringify({
-                    "novelId": contentInfo.novelId,
-                    "chapterId": contentInfo.nextChapterId
-                }),
-                contentType: 'application/json',
-                beforeSend:function(xhr){
-                   $.showLoading();
-                },
-                success: function (res) {
-                    $.hideLoading();
-                    if (res === undefined || res.success === false) {
-                        $.toastFast("出错了", "text");
-                        return;
-                    }
-                    contentInfo = res.data;
-                    if (contentInfo !== undefined && contentInfo.name !== undefined && contentInfo.name !== "章节错误") {
-                         let content = `<h2 class="weui-c-title contentDetailTitleClass">${contentInfo.name}</h2><div class="contentDetailTextClass">${contentInfo.contentText}</div>`;
-                         $('#contentDetail').append(content)
-                    } else {
-                        $("#getmore").html("没有更多数据了");
-                        hasMoreFlag = false
-                    }
-                },
-                error(err) {
-                    $.hideLoading();
-                    $.toastFast("出错了", "text");
-                }
-            })
+            $.showLoading();
+            if(contentInfo.nextChapterUrl == undefined || contentInfo.nextChapterUrl  == ""){
+                $.hideLoading();
+                setTimeout(function () {
+                    $.toastFast("没有更多数据了","text");
+                },700);
+                hasMoreFlag = false;
+                $("#getmore").html("没有更多数据了");
+                return;
+            }
+            window.location.replace(contentInfo.nextChapterUrl);
+            // $.ajax({
+            //     url: '/api/novel/contentInfo',
+            //     type: 'post',
+            //     data: JSON.stringify({
+            //         "novelId": contentInfo.novelId,
+            //         "chapterId": contentInfo.nextChapterId
+            //     }),
+            //     contentType: 'application/json',
+            //     beforeSend:function(xhr){
+            //        $.showLoading();
+            //     },
+            //     success: function (res) {
+            //         $.hideLoading();
+            //         if (res === undefined || res.success === false) {
+            //             $.toastFast("出错了", "text");
+            //             return;
+            //         }
+            //         contentInfo = res.data;
+            //         if (contentInfo !== undefined && contentInfo.name !== undefined && contentInfo.name !== "章节错误") {
+            //              let content = `<h2 class="weui-c-title contentDetailTitleClass">${contentInfo.name}</h2><div class="contentDetailTextClass">${contentInfo.contentText}</div>`;
+            //              $('#contentDetail').append(content)
+            //         } else {
+            //             $("#getmore").html("没有更多数据了");
+            //             hasMoreFlag = false
+            //         }
+            //     },
+            //     error(err) {
+            //         $.hideLoading();
+            //         $.toastFast("出错了", "text");
+            //     }
+            // })
         }
     });
     
