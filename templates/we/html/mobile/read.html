@@ -10,7 +10,21 @@
     </head>
     <link rel="stylesheet" th:href="@{/static/mobile/css/layer.css}"/>
     <script th:src="@{/static/mobile/js/layer.js}"></script>
-
+    <script th:src="@{/static/mobile/js/sidebar.js}"></script>
+    <style>
+        * { touch-action: pan-y; }
+        .weui-navs a {
+            line-height: 20px;
+        }
+        .navs-cell p {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+        .navs-cells{
+            margin-top: 0;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
 <div>
@@ -32,12 +46,116 @@
         </div>
 
         <div class="setHide"></div>
-        <div id="setPanelBottom" class="setShow">bottom</div>
+        <div id="setPanelBottom" class="setShow">
+
+            <div class="weui-flex">
+                字号
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <label class="weui-label-s f-green b-green  fontSizeClass fontSizeClass14" onclick="fontSizeClick(14)">小号</label>
+                </div></div>
+                <div class="weui-flex__item" ><div class="placeholder ">
+                    <label class="weui-label-s f-green b-green fontSizeClass fontSizeClass15" onclick="fontSizeClick(15)">中号</label>
+                </div></div>
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <label class="weui-label-s f-white bg-green fontSizeClass fontSizeClass16" onclick="fontSizeClick(16)">标准</label>
+                </div></div>
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <label class="weui-label-s f-green b-green fontSizeClass fontSizeClass17" onclick="fontSizeClick(17)">大号</label>
+                </div></div>
+                <div class="weui-flex__item "><div class="placeholder">
+                    <label class="weui-label-s f-green b-green fontSizeClass fontSizeClass18" onclick="fontSizeClick(18)">超大号</label>
+                </div></div>
+            </div>
+
+
+            <div class="weui-flex color-chose-panel">
+                颜色
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <div class="weui-avatar-circle default colorChoseClass" onclick="colorChoseClick('default')">
+                        <span class="weui-icon-success weui-icon-safe-warn"></span>
+                    </div>
+                </div></div>
+                <div class="weui-flex__item" ><div class="placeholder ">
+                    <div class="weui-avatar-circle taupe colorChoseClass" onclick="colorChoseClick('taupe')">
+
+                    </div>
+                </div></div>
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <div class="weui-avatar-circle darkBlue colorChoseClass" onclick="colorChoseClick('darkBlue')">
+                    </div>
+                </div></div>
+                <div class="weui-flex__item " ><div class="placeholder">
+                    <div class="weui-avatar-circle grey colorChoseClass" onclick="colorChoseClick('grey')">
+                    </div>
+                </div></div>
+                <div class="weui-flex__item "><div class="placeholder">
+                    <div class="weui-avatar-circle dark colorChoseClass" onclick="colorChoseClick('dark')">
+                    </div>
+                </div></div>
+            </div>
+
+            <div>
+                <div class="weui-grids grids-small"  >
+                    <div   class="grid catalogClass"  navbar-toggle onclick="catalogClick()">
+                        <div class="weui-grid__icon ">
+                            <span class="icon icon-81 f27"></span>
+                        </div>
+                        <p class="weui-grid__label">
+                            目录
+                        </p>
+                    </div>
+
+                    <a  th:href="${webBaseUrlConfig.home}" class="grid" >
+                        <div class="weui-grid__icon">
+                            <span class="icon icon-27 f27"></span>
+                        </div>
+                        <p class="weui-grid__label">
+                            书城
+                        </p>
+                    </a>
+
+                    <a th:href="${webBaseUrlConfig.bookrack}" class="grid" >
+                        <div class="weui-grid__icon">
+                            <span class=" icon icon-93 f27"></span>
+                        </div>
+                        <p class="weui-grid__label">
+                            书架
+                        </p>
+                    </a>
+                    <a href="javascript: layer.closeAll();$.toastFast('已上报','text')" class="grid" >
+                        <div class="weui-grid__icon">
+                            <span class="icon icon-20 f27"></span>
+                        </div>
+                        <p class="weui-grid__label">
+                            纠错
+                        </p>
+                    </a>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+
+    <div class="weui-navs" navbar >
+        <div class="weui-cells navs-cells" id="chapterView">
+
+        </div>
+    </div>
+    <script id="chapterViewTpl" type="text/html">
+        {{#each allChapter}}
+        <a class="weui-cell weui-cell_access navs-cell" href="{{chapterUrl}}">
+            <div class="weui-cell__bd">
+                <p>{{chapterName}}</p>
+            </div>
+        </a>
+        {{/each}}
+    </script>
 
 
 </div>
 <script th:inline="javascript">
+
     var contentInfo = [[${contentInfo}]];
     var isPop = false;
     $(function () {
@@ -55,16 +173,30 @@
                         isPop = false;
                     }
                 });
-
             }
-
+        });
+        $.ajax({
+            url: '/api/novel/getChapter',
+            type: 'post',
+            data: JSON.stringify({"novelId": [[${contentInfo.novelId}]]}),
+            contentType: 'application/json',
+            success: function(res){
+                if(res!=undefined && res.success == true){
+                    var allChapter =  res.data;
+                    var comtpl = $.t7.compile($('#chapterViewTpl').html());
+                    $('#chapterView').html(comtpl({"allChapter":allChapter}));
+                }
+            }
         });
     });
 
     function prePage(){
+
         if(contentInfo.lastChapterUrl == undefined || contentInfo.lastChapterUrl  == ""){
             $.toastFast("没有上一章了","text");
         }else{
+            layer.closeAll();
+            $.showLoading();
             window.location.replace(contentInfo.lastChapterUrl);
         }
     }
@@ -73,16 +205,66 @@
         if(contentInfo.nextChapterUrl == undefined || contentInfo.nextChapterUrl  == ""){
             $.toastFast("没有下一章了")
         }else{
+            layer.closeAll();
+            $.showLoading();
             window.location.replace(contentInfo.nextChapterUrl);
         }
     }
+    var fontSizeChose = 16;
+    function fontSizeClick(size) {
+        $('.fontSizeClass').addClass('f-green').addClass('b-green').removeClass('f-white').removeClass('bg-green');
+        $('.fontSizeClass'+size).addClass('f-white').addClass('bg-green');
+        $('.weui-content').removeClass('fontSize'+fontSizeChose).addClass('fontSize'+size);
+        fontSizeChose = size;
+    }
 
-
-
+    var colorChose = "default";
+    function colorChoseClick(color) {
+        let span = ` <span class="weui-icon-success weui-icon-safe-warn"></span>`;
+        $('.colorChoseClass').children().remove();
+        console.log( $('.' + color + ' .colorChoseClass'))
+        $('.' + color + '.colorChoseClass').append(span);
+        $('.weui-content').removeClass(colorChose).addClass(color);
+        colorChose = color;
+    }
+    var sidebarjs = new SidebarJS('navbar');
+    function catalogClick() {
+        layer.closeAll();
+        sidebarjs.open();
+    }
+    
+    
 </script>
 </body>
 
 <style>
+    .weui-grid__icon span{
+        color: #8c8c8c;
+    }
+    .weui-grids:before,.weui-grids:after {
+        border: none !important;
+    }
+
+    .grids-small .grid {
+        width: 22%;
+
+    }
+    .color-chose-panel{
+        margin: 15px 0;
+    }
+    .color-chose-panel .placeholder{
+        padding-left: 14px;
+    }
+    .weui-avatar-circle{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        padding-left: 5px;
+    }
+    .weui-icon-safe-warn{
+        width: 3px;
+        height: 3px;
+    }
     .weui-content{
         min-height: 95vh;
     }
@@ -108,11 +290,11 @@
         text-align: right;
     }
     #setPanelBottom{
-        font-size: 16px;
+        font-size: 8px;
         border-radius: 5px 5px;
         padding: 10px;
         text-align: center;
-        margin: 0;
+        margin: 0 0 0 5px;
     }
     #setPanelTop{
         font-size: 8px;
