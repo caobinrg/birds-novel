@@ -29,8 +29,16 @@
 <body>
 <div>
     <div class="weui-content default fontSize16">
-        <h2 class="weui-c-title" th:text="${contentInfo.name}"></h2>
-        <div th:utext="${contentInfo.contentText}">
+        <div id="contentDetail">
+            <h2 class="weui-c-title contentDetailTitleClass" th:text="${contentInfo.name}"></h2>
+            <div class="contentDetailTextClass" th:utext="${contentInfo.contentText}"></div>
+        </div>
+
+        <div class="weui-panel__ft">
+            <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                <div class="weui-cell__bd"  id="getmore">查看更多<i id="loading" class="weui-loading"></i></div>
+
+            </a>
         </div>
     </div>
 
@@ -232,12 +240,53 @@
         layer.closeAll();
         sidebarjs.open();
     }
-    
+
+    let hasMoreFlag = true
+    $('#getmore').on('click', function(e) {
+        e.stopPropagation();
+        if(hasMoreFlag) {
+            $.ajax({
+                url: '/api/novel/contentInfo',
+                type: 'post',
+                data: JSON.stringify({
+                    "novelId": contentInfo.novelId,
+                    "chapterId": contentInfo.nextChapterId
+                }),
+                contentType: 'application/json',
+                beforeSend:function(xhr){
+                   $.showLoading();
+                },
+                success: function (res) {
+                    $.hideLoading();
+                    if (res === undefined || res.success === false) {
+                        $.toastFast("出错了", "text");
+                        return;
+                    }
+                    contentInfo = res.data;
+                    if (contentInfo !== undefined && contentInfo.name !== undefined && contentInfo.name !== "章节错误") {
+                         let content = `<h2 class="weui-c-title contentDetailTitleClass">${contentInfo.name}</h2><div class="contentDetailTextClass">${contentInfo.contentText}</div>`;
+                         $('#contentDetail').append(content)
+                    } else {
+                        $("#getmore").html("没有更多数据了");
+                        hasMoreFlag = false
+                    }
+                },
+                error(err) {
+                    $.hideLoading();
+                    $.toastFast("出错了", "text");
+                }
+            })
+        }
+    });
     
 </script>
 </body>
 
 <style>
+    .contentDetailTextClass{
+        margin-bottom: 20px;
+        min-height: 30vh;
+    }
     .weui-grid__icon span{
         color: #8c8c8c;
     }
