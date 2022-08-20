@@ -186,7 +186,7 @@
         </div>
     </div>
 
-    <div class="weui-navs" navbar >
+    <div class="weui-navs" navbar style="display: none">
         <div class="weui-cells navs-cells" id="chapterView">
 
         </div>
@@ -226,6 +226,8 @@
 
 </body>
 <script th:inline="javascript">
+    var sidebarjs = new SidebarJS('navbar');
+    $('.weui-navs').show();
     $('.weui-tab').tab({
         defaultIndex: 0,
         activeClass: 'tab-green',
@@ -255,7 +257,7 @@
             }
         });
     });
-    var sidebarjs = new SidebarJS('navbar');
+
     var startValue = [[ ${isStar} ]];
     function starClick(){
         if(!startValue){

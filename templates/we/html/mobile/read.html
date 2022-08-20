@@ -46,9 +46,9 @@
         <div id="setPanelTop" class="setShow" >
             <div id="tilte" th:text="${contentInfo.name}"></div>
             <div class="weui-flex turnPage">
-                <div class="weui-flex__item pre"><div class="placeholder" onclick="prePage()">上一页</div></div>
+                <div class="weui-flex__item pre"><div class="placeholder" onclick="prePage()">上一章</div></div>
                 <div class="weui-flex__item2"><div class="placeholder "></div></div>
-                <div class="weui-flex__item next"><div class="placeholder" onclick="nextPage()">下一页</div></div>
+                <div class="weui-flex__item next"><div class="placeholder" onclick="nextPage()">下一章</div></div>
              </div>
             <div id="webSite" th:text="${webSiteName}"></div>
         </div>
@@ -145,7 +145,7 @@
     </div>
 
 
-    <div class="weui-navs" navbar >
+    <div class="weui-navs" navbar style="display: none">
         <div class="weui-cells navs-cells" id="chapterView">
 
         </div>
@@ -164,6 +164,12 @@
 </div>
 <script th:inline="javascript">
 
+    var sidebarjs = new SidebarJS('navbar');
+    $('.weui-navs').show();
+    function catalogClick() {
+        layer.closeAll();
+        sidebarjs.open();
+    }
     var contentInfo = [[${contentInfo}]];
     var isPop = false;
     $(function () {
@@ -234,11 +240,6 @@
         $('.' + color + '.colorChoseClass').append(span);
         $('.weui-content').removeClass(colorChose).addClass(color);
         colorChose = color;
-    }
-    var sidebarjs = new SidebarJS('navbar');
-    function catalogClick() {
-        layer.closeAll();
-        sidebarjs.open();
     }
 
     let hasMoreFlag = true
@@ -316,7 +317,7 @@
         padding-left: 14px;
     }
     .weui-avatar-circle{
-        width: 30px;
+        width: 28px;
         height: 30px;
         border-radius: 50%;
         padding-left: 5px;
@@ -336,7 +337,7 @@
         text-overflow:ellipsis
     }
     #webSite{
-        font-size: 10px;
+        font-size: 14px;
         font-weight: bold;
     }
     .turnPage{
@@ -350,14 +351,14 @@
         text-align: right;
     }
     #setPanelBottom{
-        font-size: 8px;
+        font-size: 12px;
         border-radius: 5px 5px;
         padding: 10px;
         text-align: center;
         margin: 0 0 0 5px;
     }
     #setPanelTop{
-        font-size: 8px;
+        font-size: 12px;
         border-radius: 5px 5px;
         padding: 10px;
         text-align: center;
