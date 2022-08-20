@@ -24,6 +24,12 @@
             margin-top: 0;
             overflow: auto;
         }
+        .layui-m-layer{
+            z-index: 2147483647;
+        }
+        [sidebarjs]{
+            z-index: 2147483647;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +46,9 @@
 
             </a>
         </div>
+
+        <div th:replace="mobile/common/ads::adsInset"></div>
+        <div th:replace="mobile/common/ads::adsRead"></div>
     </div>
 
     <div id="setPanel" style="display: none">

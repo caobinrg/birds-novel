@@ -76,6 +76,9 @@
         .weui-tabbar__item{
             color: #999999 !important;
         }
+        [sidebarjs]{
+            z-index: 2147483647;
+        }
     </style>
 </head>
 <body>
@@ -140,7 +143,8 @@
         </a>
     </div>
 
-
+    <div th:replace="mobile/common/ads::adsInset"></div>
+    <div th:replace="mobile/common/ads::adsBook"></div>
 
     <div class="weui-tab">
         <div class="weui-navbar">

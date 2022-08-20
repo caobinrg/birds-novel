@@ -53,6 +53,7 @@
         }
         .weui-tabbar{
             background-color: white;
+            z-index: 2147483647;
         }
         #searchBtn,searchBtnInner{
             line-height: 2.2 !important;
@@ -139,6 +140,9 @@
             </div>
         </a>
     </div>
+
+    <div th:replace="mobile/common/ads::adsInset"></div>
+    <div th:replace="mobile/common/ads::adsHome"></div>
 
     <div class="weui-cell">
         <div class="weui-cell__hd">
