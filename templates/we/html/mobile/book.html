@@ -79,6 +79,9 @@
         [sidebarjs]{
             z-index: 2147483647;
         }
+        .chapterDivClass{
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -170,7 +173,7 @@
             </div>
         </div>
 
-        <div class="weui-tab-content-item">
+        <div class="weui-tab-content-item chapterDivClass">
             <div class="weui-cells" >
                 <a class="weui-cell weui-cell_access" th:href="${chapter.chapterUrl}" th:each="chapter : ${novel.chapterList}">
                     <div class="weui-cell__bd">
@@ -230,12 +233,12 @@
 
 </body>
 <script th:inline="javascript">
-    var sidebarjs = new SidebarJS('navbar');
-    $('.weui-navs').show();
+
     $('.weui-tab').tab({
         defaultIndex: 0,
         activeClass: 'tab-green',
         onToggle: function (index) {
+
             var tabContents = $(".weui-tab-content").children();
             $.each(tabContents,function (itemIndex,item) {
                 if(itemIndex === index){
@@ -246,6 +249,9 @@
             });
         }
     });
+    $('chapterDivClass').show();
+
+
     $(function(){
         $.ajax({
             url: '/api/novel/getChapter',
@@ -261,6 +267,9 @@
             }
         });
     });
+
+    var sidebarjs = new SidebarJS('navbar');
+    $('.weui-navs').show();
 
     var startValue = [[ ${isStar} ]];
     function starClick(){
