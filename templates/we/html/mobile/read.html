@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <head th:replace="mobile/common/header :: common_header(
-    title=${contentInfo.name+'_'+contentInfo.novelName + '_' +webSiteName},
-    keywords=${contentInfo.name+','+contentInfo.novelName},
-    description=${contentInfo.name+','+contentInfo.novelName})">
+    title=${contentInfo.name+'_'+ (contentInfo.novelName ?:'') + '_' +webSiteName},
+    keywords=${contentInfo.name+','+(contentInfo.novelName ?:'')},
+    description=${contentInfo.name+','+(contentInfo.novelName ?:'')})">
     </head>
     <link rel="stylesheet" th:href="@{/static/mobile/css/layer.css}"/>
     <script th:src="@{/static/mobile/js/layer.js}"></script>
@@ -388,10 +388,10 @@
     }
     
     function nextPage() {
+        layer.closeAll();
         if(contentInfo.nextChapterUrl == undefined || contentInfo.nextChapterUrl  == ""){
             $.toastFast("没有下一章了")
         }else{
-            layer.closeAll();
             $.showLoading();
             window.location.replace(contentInfo.nextChapterUrl);
         }
