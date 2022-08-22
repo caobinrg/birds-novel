@@ -13,9 +13,15 @@
             height: 100%;
         }
     </style>
+    <style scoped>
+
+        [v-cloak]{
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-cloak>
 <van-pull-refresh v-model="loading" @refresh="onRefresh">
     <div>
 <!--        <van-nav-bar title="书架" />-->

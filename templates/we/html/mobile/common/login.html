@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+
+    <div th:fragment="login(hasClose)">
+        <div id="loginView" class='weui-popup__container' >
+            <div class="weui-popup__overlay"></div>
+            <div class="weui-popup__modal" style="background-color: white">
+                <div class="page-hd">
+                    <h1 class="page-hd-title" style="color: black; text-align: center; font-weight: bold;margin-bottom: 20px">
+                        登录
+                    </h1>
+<!--                    <p class="page-hd-desc">111111</p>-->
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">&nbsp;&nbsp;&nbsp;&nbsp;账号 :</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" id="username"  placeholder="请输入账号">
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">&nbsp;&nbsp;&nbsp;&nbsp;密码 :</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" id="password"  placeholder="请输入密码" type="password">
+                        </div>
+                    </div>
+                    <div class="weui-cell" id="confirmPasswordCell" style="display: none">
+                        <div class="weui-cell__hd"><label class="weui-label">确认密码 :</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" id="confirmPassword"  placeholder="请再次输入密码" type="password">
+                        </div>
+                    </div>
+                </div>
+               <div style="padding: 10px 80px">
+                   <a href="javascript:;" id="loginBtn" class="weui-btn weui-btn_primary" onclick="doLogin()">登录</a>
+                   <a href="javascript:;" id="registerBtn" class="weui-btn weui-btn_primary" onclick="doRegister()" style="display: none">注册</a>
+                   <a href="javascript:;" id="toRegisterBtn" class="weui-btn weui-btn_plain-primary" onclick="toRegisterView()">去注册</a>
+                   <a href="javascript:;" id="toLoginBtn" class="weui-btn weui-btn_plain-primary" onclick="toLoginView()" style="display: none">去登录</a>
+                   <a href="javascript:;"  th:if="${hasClouse != false}" class="weui-btn weui-btn_default" onclick="closeLoginPop()">取消</a>
+               </div>
+            </div>
+        </div>
+
+        <script>
+            var ifLoginView = true;
+            function doLogin() {
+                let username = $('#username').val();
+                let password = $('#password').val();
+                if(username == "" || password == ""){
+                    $.toastFast("请输入账号和密码", "text");
+                    return;
+                }
+                $.ajax({
+                    url: '/api/user/login',
+                    type: 'post',
+                    data: JSON.stringify({"userName":username,"userPassword":password}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    async:false,
+                    success:function (res) {
+                        if(res!=undefined && res.success == true){
+                            $.toastFast("登录成功");
+                            closeLoginPop();
+                            if(typeof loginSuccess != 'undefined' && $.isFunction(loginSuccess)){
+                                loginSuccess(res.data);
+                            }
+                        }else{
+                            $.toastFast(res.msg ? res.msg : "登录失败","text")
+                        }
+                    },
+                    error: function () {
+                        $.toastFast(res.msg ? res.msg : "登录失败","text")
+                    }
+                });
+            }
+            function doRegister() {
+                let username = $('#username').val();
+                let password = $('#password').val();
+                let confirmPassword = $('#confirmPassword').val();
+                if(!username){
+                    $.toastFast("请检查账号！","text");
+                    return;
+                }
+                if(password == "" || confirmPassword == "" || password != confirmPassword ){
+                    $.toastFast("请检查密码！","text")
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/user/register',
+                    type: 'post',
+                    data: JSON.stringify({"userName":username,"userPassword":password}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success:function (res) {
+                        if(res!=undefined && res.success == true){
+                            $.toastFast("注册成功");
+                            closeLoginPop();
+                            if(typeof registerSuccess != 'undefined' && $.isFunction(registerSuccess)){
+                                registerSuccess(res.data);
+                            }
+                        }else{
+                            $.toastFast(res.msg ? res.msg : "注册失败","text")
+                        }
+                    },
+                    error: function () {
+                        $.toastFast("注册失败！","text")
+                    }
+                });
+            }
+
+            function closeLoginPop() {
+                $.closePopup();
+                history.back(-1);
+            }
+
+
+            function toRegisterView() {
+                if(ifLoginView){
+                    //登录页面 -> 注册页面
+                    $('#loginBtn,#toRegisterBtn').hide();
+                    $('#toLoginBtn,#registerBtn,#confirmPasswordCell').show();
+                    clearInput();
+                }
+                ifLoginView = false;
+            }
+
+            function toLoginView() {
+                if(!ifLoginView){
+                    // 注册页面 -> 登录页面
+                    $('#toLoginBtn,#registerBtn,#confirmPasswordCell').hide();
+                    $('#loginBtn,#toRegisterBtn').show();
+                    clearInput();
+                }
+                ifLoginView = true;
+            }
+
+            function clearInput() {
+                $('#username,#password,#confirmPassword').val('');
+            }
+
+            var isLoginPop = false;
+            $(document).on("open", ".weui-popup__modal", function() {
+                isLoginPop = true;
+                window.history.pushState('forward', null, '#login');
+                window.history.forward(1);
+                if(typeof loginPopUp != 'undefined' && $.isFunction(loginPopUp)){
+                    loginPopUp();
+                }
+            }).on("close", ".weui-popup__modal", function() {
+                isLoginPop = false;
+                if(typeof loginPopClose != 'undefined' && $.isFunction(loginPopClose)){
+                    loginPopClose();
+                }
+            });
+
+            $(function() {
+                if (window.history && window.history.pushState) {
+                    $(window).on('popstate', function () {
+                        if(isLoginPop){
+                            $.closePopup();
+                        }
+                    });
+                }
+            });
+
+
+
+
+        </script>
+
+
+    </div>
+
+</body>
+</html>

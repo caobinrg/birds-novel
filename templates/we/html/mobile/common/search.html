@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+
+    <div th:fragment="search">
+        <div id="searchView" class='weui-popup__container'>
+            <div class="weui-popup__overlay"></div>
+            <div class="weui-popup__modal" style="background-color: white">
+                <div class="weui-header bg-white">
+                    <div class="weui-header-left"> <a class="icon icon-109 f-green" onclick="searchBack()">返回</a>  </div>
+                    <h1 class="weui-header-title f-black" >搜书</h1>
+                </div>
+                <div class="weui-search-bar" style="background-color: white">
+                    <input type="search" class="search-input" id='searchInputInner' placeholder='书名'/>
+                    <button id="searchBtn"  class="weui-btn weui-btn_mini weui-btn_primary" onclick="searchBtnClickInner()"><i class="icon icon-4" ></i></button>
+                </div>
+                <div>
+                    <div class="weui-cells" id="searchList">
+                        <div class="weui-panel__bd" id="searchListView">
+
+                        </div>
+
+                    </div>
+                    <div class='pager2' id="pager">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script id="searchListViewTpl" type="text/html">
+            {{#each novelInfos}}
+            <a href="{{novelUrl}}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb lazy" src="{{image}}" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title"> {{name}} </h4>
+                    <p class="weui-media-box__desc">
+                        {{#if intro}}
+
+                        {{intro}}
+                        {{#else}}
+                        暂无描述
+                        {{/if}}
+                    </p>
+                    <p class="page-hd-desc">{{author}}</p>
+                </div>
+            </a>
+            {{/each}}
+        </script>
+
+        <script>
+            var pagesize = 5; //每页显示数
+            var showPage = 5; //每页显示页码数
+            function searchBtnClickInner() {
+                startSearch(1)
+            }
+            function startSearchForOut(keyword) {
+                $('#searchInputInner').val(keyword);
+                startSearch(1)
+            }
+            function startSearch(pageNo){
+                let keyword = $("#searchInputInner").val();
+                if(!keyword){
+                    $.toastFast("请输入搜索内容","text");
+                    return
+                }
+                $.showLoading();
+                $.ajax({
+                    url: '/api/novel/searchNovelByNovelName',
+                    type: 'post',
+                    data: JSON.stringify({"pageNo":pageNo,
+                        "pageSize":pagesize,
+                        "novelName":keyword}),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (res) {
+                        if(res!=undefined && res.success == true){
+                            var searchData = res.data;
+                            let searchTotal = searchData.total;
+                            var novelInfos =  searchData.data;
+                            var comtpl = $.t7.compile($('#searchListViewTpl').html());
+                            $('#searchListView').html(comtpl({"novelInfos":novelInfos}));
+                            pagerCreate(searchTotal,pageNo);
+
+                        }
+                        $.hideLoading();
+                    },
+                    error(err) {
+                        $.hideLoading();
+                        $.toastFast("出错了","text");
+                    }
+                });
+            }
+
+            function pagerCreate(searchTotal,pageNo) {
+                //总页数
+                var totalPage = Math.ceil(searchTotal / pagesize);
+                //分页开始页码
+                var beginPageNum = (Math.ceil(pageNo / showPage) - 1) * showPage + 1;
+                //分页结束页码
+                var endPageNum = (beginPageNum + showPage - 1 >= totalPage) ? totalPage : (beginPageNum + showPage - 1); //分页结束页码
+                beginPageNum = ((endPageNum - beginPageNum < showPage) && (totalPage > showPage)) ? (endPageNum - showPage + 1) : beginPageNum;
+                var pageHtml = "<a class='pager2-pre' href='javascript:" + (pageNo == 1 ? "void(0)" : ("startSearch(" + (pageNo - 1) + ")")) + ";'>&lt;</a>";
+                for(var i = beginPageNum; i <= endPageNum; i ++)
+                    pageHtml += "<a href='javascript:startSearch(" + i + ");'" + (i == pageNo ? " class='active'" : "") + ">" + i + "</a>";
+                pageHtml += "<a class='pager2-next' href='javascript:" + (pageNo == totalPage ? "void(0)" : ("startSearch(" + (pageNo + 1) + ")")) + ";'>&gt;</a>";
+                $("#pager").html(pageHtml);
+            }
+            var isSearchPop = false;
+            $(document).on("open", ".weui-popup__modal", function() {
+                isSearchPop = true;
+                window.history.pushState('forward', null, '#search');
+                window.history.forward(1);
+                if(typeof searchPopUp != 'undefined' && $.isFunction(searchPopUp)){
+                    searchPopUp();
+                }
+            }).on("close", ".weui-popup__modal", function() {
+                isSearchPop = false;
+                if(typeof searchPopClose != 'undefined' && $.isFunction(searchPopClose)){
+                    searchPopClose( $('#searchInputInner').val());
+                }
+            });
+
+            function searchBack(){
+                $.closePopup();
+                history.back(-1);
+            }
+
+            $(function() {
+                if (window.history && window.history.pushState) {
+                    $(window).on('popstate', function () {
+                        if(isSearchPop){
+                            $.closePopup();
+                        }
+                    });
+                }
+            });
+
+        </script>
+
+    </div>
+
+
+
+
+</div>
+
+
+</body>
+</html>

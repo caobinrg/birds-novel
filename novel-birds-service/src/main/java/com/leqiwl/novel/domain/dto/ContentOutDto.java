@@ -38,12 +38,14 @@ public class ContentOutDto implements IDtoParseUrl {
         if(StrUtil.isNotBlank(lastChapterId)){
             this.lastChapterUrl = WebMappingUrlConfig.instance().getPage()
                     + "/" + novelId
-                    + "/" + lastChapterId;
+                    + "/" + lastChapterId
+                    + ".html";
         }
         if(StrUtil.isNotBlank(nextChapterId)){
             this.nextChapterUrl = WebMappingUrlConfig.instance().getPage()
                     + "/" + novelId
-                    + "/" + nextChapterId;
+                    + "/" + nextChapterId
+                    + ".html";
         }
     }
 }

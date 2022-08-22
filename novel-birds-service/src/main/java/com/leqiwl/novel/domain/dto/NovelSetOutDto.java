@@ -116,7 +116,7 @@ public class NovelSetOutDto implements IDtoParseUrl {
     @Override
     public void parseUrl() {
         if(StrUtil.isNotBlank(this.novelId)){
-            this.novelUrl = WebMappingUrlConfig.instance().getPage() + "/" + this.novelId;
+            this.novelUrl = WebMappingUrlConfig.instance().getPage() + "/" + this.novelId   + ".html";
         }
     }
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.core.util.CharsetUtil;
 import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
+import com.leqiwl.novel.job.config.SpiderConfig;
 import com.leqiwl.novel.job.pip.downloader.SpiderDownloader;
 import com.leqiwl.novel.job.pip.listener.SpiderEventListener;
 import com.leqiwl.novel.job.pip.pipeline.SpiderSavePipLine;
@@ -31,10 +32,12 @@ import java.util.concurrent.*;
 @Slf4j
 @Configuration
 public class SpiderStartContainerFactory {
-    @Value("${spider.threadNum:0}")
-    private int threadNum;
+
 
     private static ExecutorService executorService;
+
+    @Resource
+    private SpiderConfig spiderConfig;
 
     @Resource
     private SpiderProcessor spiderProcessor;
@@ -54,18 +57,21 @@ public class SpiderStartContainerFactory {
     @Resource
     private RedissonClient redissonClient;
 
-    private static final Map<String, SpiderStartContainer> startContainerMap = Collections.synchronizedMap(new HashMap<>());
+    private static final  Map<String, SpiderStartContainer> startContainerMap = Collections.synchronizedMap(new HashMap<>());
 
-    public SpiderStartContainer getStartContainer(String domain) {
-        if(startContainerMap.get(domain) != null){
-            return startContainerMap.get(domain);
+    public synchronized SpiderStartContainer getStartContainer(String domain) {
+        SpiderStartContainer spiderStartContainer = startContainerMap.get(domain);
+        if(spiderStartContainer != null){
+            return spiderStartContainer;
         }
-        SpiderStartContainer spiderStartContainer =
+        spiderStartContainer =
                 SpiderStartContainer.create(spiderProcessor, spiderEventListener, redissonClient);
         spiderStartContainer.setDownloader(spiderDownloader);
         spiderStartContainer.setScheduler(spiderRedisScheduler);
         spiderStartContainer.setPipelines(Collections.singletonList(spiderSavePipLine));
-        spiderStartContainer.setExecutorService(executorService);
+        spiderStartContainer.thread(executorService,
+                spiderConfig.getThreadNum() <= 0 ? (Runtime.getRuntime().availableProcessors() * 2) : spiderConfig.getThreadNum());
+        spiderStartContainer.setExitWhenComplete(false);
         startContainerMap.put(domain,spiderStartContainer);
         return spiderStartContainer;
     }
@@ -82,8 +88,9 @@ public class SpiderStartContainerFactory {
 
     @PostConstruct
     public void getExecutorService(){
+        int threadNum = spiderConfig.getThreadNum();
         //线程数 cpu * 2
-        if (threadNum == 0) {
+        if (threadNum <= 0) {
             threadNum = Runtime.getRuntime().availableProcessors() * 2;
         }
         log.info("================ spider thread num :{} ================", threadNum);

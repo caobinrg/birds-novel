@@ -37,5 +37,8 @@ public class CrawlerRequestDto implements Serializable {
 
     private String  countDownSpace;
 
+    @Builder.Default
+    private boolean retry = false;
+
     private boolean jump;
 }

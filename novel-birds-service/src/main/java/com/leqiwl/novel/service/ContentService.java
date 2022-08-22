@@ -49,11 +49,11 @@ public class ContentService {
     }
 
     public Content getByNovelAndChapterId(String novelId,String chapterId){
-        Content content = contentRepository.getContentByNovelIdAndChapterId(novelId, chapterId);
-        if(null == content){
+        List<Content> contentList = contentRepository.findAllByNovelIdAndChapterId(novelId, chapterId);
+        if(CollectionUtil.isEmpty(contentList)){
             return new Content();
         }
-        return content;
+        return contentList.get(contentList.size() - 1);
     }
 
     @Cacheable(cacheNames = "viewContent#2m", key = "#novelId+'-'+#chapterId")
@@ -96,6 +96,10 @@ public class ContentService {
                 //找到章节内容
                 contentOutDto = EntityToDtoUtil.parseDataWithUrl(content,contentOutDto);
                 contentOutDto.setHasDataFlag(true);
+                String contentText = content.getContentText();
+                if(contentText.contains("重新刷新页面")){
+                    jobRemoteService.jumpGetContentAsync(chapter);
+                }
             }else{
                 //未找到章节内容
                 if(null != chapter && StrUtil.isNotBlank(chapter.getChapterName())){

@@ -115,7 +115,8 @@ public class NovelInfoOutDto implements IDtoParseUrl {
             for (Chapter chapter : chapterList) {
                 chapter.setChapterUrl(WebMappingUrlConfig.instance().getPage()
                         + "/" + novelId
-                        + "/" + chapter.getChapterId());
+                        + "/" + chapter.getChapterId()
+                        + ".html");
             }
         }
         this.chapterList = chapterList;
@@ -124,7 +125,7 @@ public class NovelInfoOutDto implements IDtoParseUrl {
     @Override
     public void parseUrl() {
         if(StrUtil.isNotBlank(this.novelId)){
-            this.novelUrl = WebMappingUrlConfig.instance().getPage() + "/" + this.novelId;
+            this.novelUrl = WebMappingUrlConfig.instance().getPage() + "/" + this.novelId   + ".html";
         }
     }
 }

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书架_' + webSiteName},
+    keywords=${'书架,' + webSiteKeywords},
+    description=${'书架,'+webSiteDescription})">
+    </head>
+    <style>
+        .weui-cell{
+            border-top: #f6f6f6  1px solid;
+            border-bottom: #f6f6f6 1px solid;
+        }
+        .bookrack_content{
+            padding-bottom: 4em;
+        }
+        .weui-media-box_appmsg .weui-media-box__thumb {
+            width: auto;
+            vertical-align: top;
+        }
+        .weui-media-box_appmsg .weui-media-box__hd {
+            margin-right: 0.8em;
+            width: 64px;
+            height: 75px;
+            line-height: 60px;
+            text-align: center;
+        }
+        .weui-msgbox{
+            margin-top: 5em;
+        }
+        .weui-tabbar{
+            background-color: white;
+            z-index: 2147483647;
+        }
+    </style>
+
+</head>
+<body>
+<div class="bookrack_content">
+    <div class="weui-cell" th:if="${not #lists.isEmpty(rackNovels)}">
+        <div class="weui-cell__hd">
+            <i class="icon icon-49 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;书架
+        </div>
+    </div>
+
+    <div class="weui-panel__bd" th:each="novelInfoOutDto:${rackNovels}">
+        <a th:href="${novelInfoOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" th:src="${novelInfoOutDto.image}" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title"> [[${novelInfoOutDto.name}]] </h4>
+                <p class="weui-media-box__desc">[[${#strings.isEmpty(novelInfoOutDto.intro)} ? 暂无描述 : ${novelInfoOutDto.intro} ]]</p>
+                <p class="page-hd-desc">[[${novelInfoOutDto.author}]]</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="weui-cell" >
+        <div class="weui-cell__hd">
+            <i class="icon icon-51 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;阅读历史
+        </div>
+    </div>
+    <div class="weui-panel__bd" th:each="novelInfoOutDto:${novelHis}">
+        <a th:href="${novelInfoOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" th:src="${novelInfoOutDto.image}" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title"> [[${novelInfoOutDto.name}]] </h4>
+                <p class="weui-media-box__desc">[[${#strings.isEmpty(novelInfoOutDto.intro)} ? 暂无描述 : ${novelInfoOutDto.intro} ]]</p>
+                <p class="page-hd-desc">[[${novelInfoOutDto.author}]]</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="weui-msgbox" th:if="${#lists.isEmpty(novelHis) && #lists.isEmpty(rackNovels)}">
+        <p>
+            <i class="weui-icon-info-circle"></i>暂无数据
+        </p>
+    </div>
+
+    <div th:replace="mobile/common/ads::adsInset"></div>
+    <div th:replace="mobile/common/ads::adsBookRack"></div>
+
+</div>
+
+<div th:replace="mobile/common/footer::tabbar(1)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+
+<script th:inline="javascript">
+    console.log([[${rackNovels}]])
+</script>
+</body>
+
+</html>

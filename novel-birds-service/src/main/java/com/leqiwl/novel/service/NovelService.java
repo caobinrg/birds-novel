@@ -48,26 +48,34 @@ public class NovelService {
     @CachePut(cacheNames = "novel#2m", key="#novel.getIdMark()")
     public Novel save(Novel novel) throws InterruptedException {
         RLock lock = null;
+        Novel dbNovel = null;
         try {
             lock = redissonClient.getLock("novelSave" + novel.getIdMark());
-            lock.tryLock(3,6, TimeUnit.SECONDS);
-            Novel dbNovel = this.novelRepository.getNovelByIdMark(novel.getIdMark());
-            if(null == dbNovel){
-                return this.novelRepository.save(novel);
+            boolean tryLock = false;
+            while (!tryLock){
+                tryLock = lock.tryLock(3, 6, TimeUnit.SECONDS);
+                if(!tryLock){
+                    TimeUnit.SECONDS.sleep(3);
+                }
+                dbNovel = this.novelRepository.getNovelByIdMark(novel.getIdMark());
+                if(null == dbNovel){
+                    return this.novelRepository.save(novel);
+                }
+                if(novel.getNovelId().equals(dbNovel.getNovelId())){
+                    novel.setId(dbNovel.getId());
+                    return this.novelRepository.save(novel);
+                }
+                //idMark 冲突，忽略改书
             }
-            if(novel.getName().equals(dbNovel.getName()) && novel.getRuleId().equals(dbNovel.getRuleId())){
-                novel.setId(dbNovel.getId());
-                return this.novelRepository.save(novel);
-            }
+            return dbNovel;
         } catch (InterruptedException e) {
-           throw e;
+            log.info(e.getMessage(),e);
+            throw e;
         }finally {
-            if(null != lock){
+            if(null != lock && lock.isHeldByCurrentThread()){
                 lock.unlock();
             }
         }
-
-        return new Novel();
     }
 
     @Cacheable(cacheNames = "novel#2m", key = "#idMark")
@@ -79,7 +87,7 @@ public class NovelService {
         return novel;
     }
 
-    @Cacheable(cacheNames = "novel#2m", key = "#novelId")
+    @Cacheable(cacheNames = "novelById#2m", key = "#novelId")
     public Novel getByNovelId(String novelId){
         Novel novel = this.novelRepository.getNovelByNovelId(novelId);
         if(null == novel){

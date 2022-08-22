@@ -1,5 +1,5 @@
 templates:
-  name: default
+  name: we
 mapping:
   index: "/web"
   home: "/web/home"

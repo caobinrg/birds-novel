@@ -31,7 +31,8 @@ public class ChapterOutDto implements IDtoParseUrl {
         if(StrUtil.isNotBlank(novelId) && StrUtil.isNotBlank(chapterId)){
             this.chapterUrl = WebMappingUrlConfig.instance().getPage()
                     + "/" + novelId
-                    + "/" + chapterId;
+                    + "/" + chapterId
+                    + ".html";
         }
     }
 }

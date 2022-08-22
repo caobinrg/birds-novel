@@ -63,16 +63,18 @@ public class NovelListProcessor implements NovelProcessor {
 
 
     private  void pushNextListPage(Page page,CrawlerRequestDto requestInfo,CrawlerRule crawlerInfo) {
+        CrawlerRequestDto nextRequestInfo = new CrawlerRequestDto();
+        BeanUtil.copyProperties(requestInfo,nextRequestInfo);
         CrawlerListRule listRule = crawlerInfo.getListRule();
         String url = listRule.getSourceUrl();
         if(!url.contains(RequestConst.PAGE_REPLACE)){
             //单页任务
             //设置下次列表采集时间
-            pushDelayMessage(requestInfo, crawlerInfo);
+            pushDelayMessage(nextRequestInfo, crawlerInfo);
             return;
         }
         Integer initStatus = crawlerInfo.getInitStatus();
-        int currentPageNo = requestInfo.getCurrentPageNo();
+        int currentPageNo = nextRequestInfo.getCurrentPageNo();
         int pageEndRule = 0;
         if(1 == initStatus){
             //初始化已完成后执行部分任务
@@ -92,10 +94,10 @@ public class NovelListProcessor implements NovelProcessor {
             return;
         }
         String nextUrl = url.replace(RequestConst.PAGE_REPLACE, nextPage+"");
-        requestInfo.setUrl(nextUrl);
-        requestInfo.setCurrentPageNo(nextPage);
+        nextRequestInfo.setUrl(nextUrl);
+        nextRequestInfo.setCurrentPageNo(nextPage);
         Request nextPageRequest = new Request(nextUrl);
-        nextPageRequest.putExtra(RequestConst.REQUEST_INFO,requestInfo);
+        nextPageRequest.putExtra(RequestConst.REQUEST_INFO,nextRequestInfo);
         page.addTargetRequest(nextPageRequest);
     }
 

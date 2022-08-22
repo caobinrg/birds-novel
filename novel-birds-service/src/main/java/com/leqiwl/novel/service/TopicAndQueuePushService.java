@@ -57,6 +57,16 @@ public class TopicAndQueuePushService {
 
     }
 
+    @Async
+    public void sendSaveUrl(String url){
+        if(StrUtil.isBlank(url)){
+            return;
+        }
+        RBlockingQueue<String> blockingQueue =
+                redissonClient.getBlockingQueue(TopicAndQueueKeyConst.ULR_SAVE_QUEUE);
+        blockingQueue.putAsync(url);
+    }
+
     private NovelIdTopicDto getNovelIdTopicDto(String novelId){
         NovelIdTopicDto novelIdTopicDto = new NovelIdTopicDto();
         novelIdTopicDto.setNovelId(novelId);

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    ${novel.name + '_'  + webSiteName},
+    ${novel.keywords},
+    ${novel.description})">
+        <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
+    </head>
+    <script th:src="@{/static/mobile/js/sidebar.js}"></script>
+    <style >
+        .weui-news-list{
+            background-color: #81868c !important;
+        }
+        .weui-news-text{
+            position: absolute;
+            bottom: 10px;
+        }
+        .page-hd-title{
+            color: #FFFFFF;
+        }
+        .weui-news-title{
+            font-size: 14px;
+            color: #D4D0D0;
+        }
+        .weui-news-media img{
+            border-radius: 5px;
+        }
+        .grid .icon{
+            font-size: 24px;
+            line-height: 40px;
+            margin: 5px 0;
+            color: #323233;
+            -webkit-transition: font-size 0.5s ease-out 0s;
+            -moz-transition: font-size 0.5s ease-out 0s;
+            transition: font-size 0.5s ease-out 0s;
+        }
+        .grid p{
+            margin-top: 10px !important;
+        }
+        .weui-grids a{
+            border: #f6f6f6  1px solid;
+        }
+        .weui-navbar{
+            background-color: white;
+        }
+        .weui-tab-content{
+            margin-top: 53px;
+        }
+        .weui-tab-content p{
+            font-size: 16px;
+        }
+        .weui-content{
+            padding-top: 5px;
+        }
+        * { touch-action: pan-y; }
+        .weui-navs a {
+            line-height: 20px;
+        }
+        .navs-cell p {
+            margin-left: 5px;
+            font-size: 14px;
+        }
+        .navs-cells{
+            margin-top: 0;
+            overflow: auto;
+        }
+        .weui-tabbar{
+            background-color: white;
+        }
+        .book-content{
+            padding-bottom: 4em;
+        }
+        .weui-tabbar__item{
+            color: #999999 !important;
+        }
+        [sidebarjs]{
+            z-index: 2147483647;
+        }
+        .chapterDivClass{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="book-content">
+
+    <div class="weui-header bg-white">
+        <div class="weui-header-left"> <a class="icon icon-109 f-green" onclick="history.back(-1);">返回</a>  </div>
+        <h1 class="weui-header-title f-black" th:text="${novel.name}"></h1>
+    </div>
+    <div class="weui-news" >
+        <ul class="weui-news-list">
+            <li class="weui-news-item">
+                <div class="weui-news-inner">
+                    <div class="weui-news-inners">
+                        <div>
+                            <h1 class="page-hd-title" th:text="${novel.name}"></h1>
+                        </div>
+                        <div class="weui-news-info">
+                            <div class="weui-news-infoitem">
+                                <div class="weui-news-title" th:text="${novel.author}"></div>
+<!--                                <span class="weui-news-left" ></span>-->
+                            </div>
+                        </div>
+                        <div class="weui-news-text">
+                            <div  class="weui-news-title novel-info" th:text="${novel.novelType}+ ' · '
+                            + ${{novel.updateStatus}} +
+                             ' · ' + ${novel.wordNum} + '万字' "></div>
+                        </div>
+                    </div>
+                    <div class="weui-news-media">
+                        <img th:src="${novel.image}" alt="">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="weui-grids"  >
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-65"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'评分 ' + ${novel.score}">
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-62"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'热度 ' +
+            ${#numbers.formatInteger( (novel.score ?: 1) , 0)} *
+            ${#numbers.formatInteger( (novel.scorePersonNum ?: 1) , 0)}
+            ">
+            </p>
+        </a>
+        <a href="javascript:;" class="grid"  >
+            <div class="weui-grid__icon">
+                <span class="icon icon-49"></span>
+            </div>
+            <p class="weui-grid__label" th:text="'收藏 ' + ${novel.scorePersonNum}">
+            </p>
+        </a>
+    </div>
+
+    <div th:replace="mobile/common/ads::adsInset"></div>
+    <div th:replace="mobile/common/ads::adsBook"></div>
+
+    <div class="weui-tab">
+        <div class="weui-navbar">
+            <div class="weui-navbar__item">
+                简介
+            </div>
+            <div class="weui-navbar__item">
+                目录
+            </div>
+        </div>
+    </div>
+
+    <div class="weui-tab-content">
+        <div class="weui-tab-content-item">
+            <div class="weui-content">
+                <div class="weui-c-inner">
+                    <div class="weui-c-content">
+                        <div class="weui-c-article">
+                            <p th:utext="${novel.intro}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="weui-tab-content-item chapterDivClass">
+            <div class="weui-cells" >
+                <a class="weui-cell weui-cell_access" th:href="${chapter.chapterUrl}" th:each="chapter : ${novel.chapterList}">
+                    <div class="weui-cell__bd">
+                        <p th:text="${chapter.chapterName}"></p>
+                    </div>
+                    <div class="weui-cell__ft">
+                    </div>
+                </a>
+                <div class="weui-cell weui-cell_access" navbar-toggle>
+                    <div class="weui-cell__bd">
+                        <p><i class="icon  icon-81"></i>&nbsp;查看完整目录</p>
+                    </div>
+                    <div class="weui-cell__ft">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="weui-navs" navbar style="display: none">
+        <div class="weui-cells navs-cells" id="chapterView">
+
+        </div>
+    </div>
+    <script id="chapterViewTpl" type="text/html">
+        {{#each allChapter}}
+        <a class="weui-cell weui-cell_access navs-cell" href="{{chapterUrl}}">
+            <div class="weui-cell__bd">
+                <p>{{chapterName}}</p>
+            </div>
+        </a>
+        {{/each}}
+    </script>
+
+
+    <div id="book-tb">
+        <div class="weui-tabbar tab-bottom">
+            <a th:href="${webBaseUrlConfig.home}" class="weui-tabbar__item">
+                <i class="icon icon-27 f27 weui-tabbar__icon"></i>
+                <p class="weui-tabbar__label">书城</p>
+            </a>
+            <a th:href="${chapterUrl}" class="weui-tabbar__item">
+                <i class="icon icon-92 f27 weui-tabbar__icon"></i>
+                <p class="weui-tabbar__label" th:text="${isFirst?'开始阅读':'继续阅读'}"></p>
+            </a>
+            <a class="weui-tabbar__item " onclick="starClick()">
+                <i id="star" th:class="'icon f27 weui-tabbar__icon ' + ${isStar ? 'icon icon-48' : 'icon icon-49'}"></i>
+                <p class="weui-tabbar__label">加入书架</p>
+            </a>
+        </div>
+    </div>
+
+    <div th:replace="mobile/common/login::login(true)"></div>
+
+
+</div>
+
+</body>
+<script th:inline="javascript">
+
+    $('.weui-tab').tab({
+        defaultIndex: 0,
+        activeClass: 'tab-green',
+        onToggle: function (index) {
+
+            var tabContents = $(".weui-tab-content").children();
+            $.each(tabContents,function (itemIndex,item) {
+                if(itemIndex === index){
+                    $(item).show();
+                    return true;
+                }
+                $(item).hide();
+            });
+        }
+    });
+    $('chapterDivClass').show();
+
+
+    $(function(){
+        $.ajax({
+            url: '/api/novel/getChapter',
+            type: 'post',
+            data: JSON.stringify({"novelId": [[${novel.novelId}]]}),
+            contentType: 'application/json',
+            success: function(res){
+                if(res!=undefined && res.success == true){
+                    var allChapter =  res.data;
+                    var comtpl = $.t7.compile($('#chapterViewTpl').html());
+                   $('#chapterView').html(comtpl({"allChapter":allChapter}));
+                }
+            }
+        });
+    });
+
+    var sidebarjs = new SidebarJS('navbar');
+    $('.weui-navs').show();
+
+    var startValue = [[ ${isStar} ]];
+    function starClick(){
+        if(!startValue){
+            $.ajax({
+                url: '/api/user/bookStar',
+                type: 'post',
+                data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId": [[${chapterId}]] }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (res) {
+                    $.hideLoading();
+                    if(res==undefined){
+                        $.toastFast("出错了", "cancel");
+                        return
+                    }
+                    if(res.success != true && res.errorCode == 10001){
+                        login();
+                        return;
+                    }
+                    if(res.success != true){
+                        $.toastFast("出错了", "cancel");
+                        return;
+                    }
+                    //收藏成功
+                    startValue = true;
+                    $.toastFast("收藏成功");
+                    $('#star').removeClass('icon-49').addClass('icon-48');
+
+                },
+                error: function () {
+                    $.toastFast("出错了", "cancel");
+                }
+            });
+        }else{
+            //取消收藏
+            $.ajax({
+                url: '/api/user/unBookStar',
+                type: 'post',
+                data: JSON.stringify({"novelId": [[${novel.novelId}]],"chapterId":self.chapterId}),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (res) {
+                    $.hideLoading();
+                    if(res==undefined){
+                        $.toastFast("出错了", "cancel");
+                        return;
+                    }
+                    if(res.success != true && res.errorCode == 10001){
+                        login();
+                        return;
+                    }
+                    if(res.success != true){
+                        $.toastFast("出错了", "cancel");
+                        return;
+                    }
+                    startValue = false;
+                    $.toastFast("取消收藏成功");
+                    $('#star').removeClass('icon-48').addClass('icon-49');
+                },
+                error: function () {
+                    $.toastFast("出错了", "cancel");
+                }
+            });
+        }
+    }
+
+    function login() {
+        $('#book-tb').hide();
+        $("#loginView").popup();
+    }
+
+    function loginPopClose() {
+        $('#book-tb').show()
+    }
+
+
+</script>
+</html>

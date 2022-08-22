@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 飞鸟不过江
@@ -59,7 +60,7 @@ public class PageController {
         response.sendRedirect(home);
     }
 
-    @GetMapping("/{novelId}")
+    @GetMapping({"/{novelId}","/{novelId}.html"})
     public String novelInfo(HttpServletRequest request,HttpServletResponse response,
                             @PathVariable String novelId, Model model)
             throws IOException, InstantiationException, IllegalAccessException {
@@ -96,13 +97,13 @@ public class PageController {
         topicPushService.sendClick(novelId);
         model.addAttribute("isFirst",firstChapterFlag);
         model.addAttribute("chapterId",chapterId);
-        model.addAttribute("chapterUrl", WebMappingUrlConfig.instance().getPage()+"/"+novelId+"/"+chapterId);
+        model.addAttribute("chapterUrl", WebMappingUrlConfig.instance().getPage()+"/"+novelId+"/"+chapterId + ".html");
         model.addAttribute("novel",novelInfoOutDto);
         model.addAttribute("isStar",isStart);
         return "book";
     }
 
-    @GetMapping("/{novelId}/{chapterId}")
+    @GetMapping({"/{novelId}/{chapterId}","/{novelId}/{chapterId}.html"})
     public String readInfo(HttpServletRequest request,
                            HttpServletResponse response,
                            @PathVariable String novelId,

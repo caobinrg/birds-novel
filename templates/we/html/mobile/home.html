@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'书城_' + webSiteName},
+    keywords=${'书城,' + webSiteKeyWords},
+    description=${'书城,'+webSiteDescription})">
+    </head>
+    <style>
+        .grid {
+            position: relative;
+            float: left;
+            padding: 20px 10px;
+            width: 33.33%;
+            box-sizing: border-box;
+            text-decoration: none;
+            display: inline-block;
+            height: 7em;
+            margin-bottom: 5px;
+        }
+        .grid img{
+            position: relative;
+            right: 0.5em;
+            width: 3em;
+            height: 4em;
+        }
+        .weui-grid__label{
+            margin-top: 3em !important;
+        }
+        #searchBar{
+            background-color: white;
+            border: none;
+        }
+        .weui-media-box_appmsg .weui-media-box__thumb {
+            width: auto;
+            vertical-align: top;
+        }
+        .home_content{
+            padding-bottom: 4em;
+        }
+        .weui-cell{
+            border-top: #f6f6f6  1px solid;
+            border-bottom: #f6f6f6 1px solid;
+        }
+        .weui-media-box_appmsg .weui-media-box__hd {
+            margin-right: 0.8em;
+            width: 64px;
+            height: 75px;
+            line-height: 60px;
+            text-align: center;
+        }
+        .weui-tabbar{
+            background-color: white;
+            z-index: 2147483647;
+        }
+        #searchBtn,searchBtnInner{
+            line-height: 2.2 !important;
+            margin-left: 5px
+        }
+    </style>
+</head>
+<body>
+<div class="home_content">
+
+    <div class="weui-search-bar" style="background-color: white">
+        <input type="search" class="search-input" id='searchInput' placeholder='书名'/>
+        <button id="searchBtn"  class="weui-btn weui-btn_mini weui-btn_primary" onclick="searchBtnClick()"><i class="icon icon-4" ></i></button>
+    </div>
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-62 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;书荒推荐
+        </div>
+        <div class="weui-cell__ft">
+            <div onclick="recommendChange()">
+                <i class="icon icon-21 f25 weui-tabbar__icon" ></i>
+                <span>换一换</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="weui-grids"  >
+        <div id="storageView">
+            <a th:href="${novelSetOutDto.novelUrl}" th:each="novelSetOutDto:${novels.shortage}" class="grid">
+                <div class="weui-grid__icon">
+                    <img th:src="${novelSetOutDto.image}" alt="">
+                </div>
+                <p class="weui-grid__label">
+                    [[${novelSetOutDto.name}]]
+                </p>
+            </a>
+        </div>
+    </div>
+
+
+
+    <script id="storageViewTpl" type="text/html">
+        {{#each shortage}}
+        <a href="{{novelUrl}}"  class="grid">
+            <div class="weui-grid__icon">
+                <img src="{{image}}" alt="">
+            </div>
+            <p class="weui-grid__label">
+                {{name}}
+            </p>
+        </a>
+        {{/each}}
+    </script>
+
+
+
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-65 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;站长推荐
+        </div>
+    </div>
+
+
+    <div class="weui-panel__bd" th:each="novelSetOutDto:${novels.recommend}">
+        <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
+                <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelSetOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelSetOutDto.intro,'<br/>','')}"></p>
+                <p class="page-hd-desc">[[${novelSetOutDto.author}]]</p>
+            </div>
+        </a>
+    </div>
+
+    <div th:replace="mobile/common/ads::adsInset"></div>
+    <div th:replace="mobile/common/ads::adsHome"></div>
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <i class="icon icon-91 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;最近更新
+        </div>
+    </div>
+
+
+    <div class="weui-panel__bd update_content" th:each="novelSetOutDto:${novels.update}">
+        <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" alt="">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title">[[${novelSetOutDto.name}]]</h4>
+                <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelSetOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelSetOutDto.intro,'<br/>','')}"></p>
+                <p class="page-hd-desc">[[${novelSetOutDto.author}]]</p>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+
+<div th:replace="mobile/common/footer::tabbar(0)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+<div th:replace="mobile/common/search::search"></div>
+</body>
+
+<script th:inline="javascript">
+    function recommendChange() {
+        $.ajax({
+            url: '/api/novel/shortage',
+            type: 'post',
+            data: {},
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (res) {
+                if(res!=undefined && res.success == true){
+                    let shortage =  res.data;
+                    let comtpl = $.t7.compile($('#storageViewTpl').html());
+                    $('#storageView').html(comtpl({"shortage":shortage}));
+                }
+            },
+            error: function () {
+               $.toastFast("出错了","text")
+            }
+        });
+    }
+    function searchBtnClick() {
+        let searchInputVal = $('#searchInput').val();
+        if(!searchInputVal){
+            $.toastFast("请输入搜索内容","text");
+            return
+        }
+        $('#tb').hide();
+        unableScroll();
+        $('#searchView').popup();
+        startSearchForOut(searchInputVal);
+    }
+
+
+    function searchPopClose(keyword) {
+        $('#searchInput').val(keyword);
+        enableScroll();
+        $('#tb').show();
+    }
+
+
+    function unableScroll() {
+        $(document.body).css({"overflow-y": "hidden"});
+    }
+
+    function enableScroll() {
+        $(document.body).css({"overflow-y": "auto"});
+    }
+
+</script>
+
+
+</html>

@@ -103,7 +103,7 @@ public class CrawlerEditorTest1 {
         log.info("......");
         String novelUrl = bookUrlNodes.get(0).xpath(listRule.getGetUrlRule()).toString();
         log.info("==============列表结束===============");
-        Thread.sleep(8000);
+//        Thread.sleep(5000);
         novelUrl =  urlReduction(baseUrl,novelUrl);
         log.info("信息页开始，url:{}",novelUrl);
         String novelInfoHtmlStr = HttpUtil.get(novelUrl);
@@ -141,7 +141,7 @@ public class CrawlerEditorTest1 {
         log.info("......");
         String chapterUrl = chapterNodeList.get(detailRule.getChapterListSkipNoRule()).xpath(detailRule.getChapterUrlRule()).toString();
         log.info("==============信息结束===============");
-        Thread.sleep(8000);
+//        Thread.sleep(5000);
         chapterUrl = urlReduction(novelUrl, chapterUrl);
         log.info("内容页开始，url:{}",chapterUrl);
         String novelContentHtmlStr = HttpUtil.get(chapterUrl);

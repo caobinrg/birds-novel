@@ -5,6 +5,7 @@ import com.leqiwl.novel.service.DelayQueueService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RedissonClient;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import us.codecraft.webmagic.Request;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +32,8 @@ public class DelayedTest {
 
     @Resource
     private DelayQueueService delayQueueService;
+
+    private RAtomicLong leftTotal;
 
     @Test
     public void testOffer(){
@@ -60,6 +64,16 @@ public class DelayedTest {
         Object take = test.take();
         System.out.println(take.toString());
         int g = 1/0;
+    }
+
+    @Test
+    public void TestLong(){
+        System.out.println(leftTotal.get());
+    }
+
+    @PostConstruct
+    public void post(){
+        leftTotal = redissonClient.getAtomicLong("atomicLong");
     }
 
 

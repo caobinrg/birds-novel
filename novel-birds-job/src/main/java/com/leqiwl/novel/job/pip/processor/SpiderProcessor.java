@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.leqiwl.novel.domain.dto.CrawlerRequestDto;
 import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerRule;
+import com.leqiwl.novel.job.config.SpiderConfig;
 import com.leqiwl.novel.service.CrawlerRuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,15 +30,9 @@ public class SpiderProcessor implements PageProcessor {
     @Resource
     private CrawlerRuleService crawlerRuleService;
 
+    @Resource
+    private SpiderConfig spiderConfig;
 
-    @Value("${spider.retryTimes:3000}")
-    private int retryTimes = 3000;
-
-    @Value("${spider.sleepTime:3000}")
-    private int sleepTime = 3000;
-
-    @Value("${spider.timeOut:60000}")
-    private int timeOut = 60000;
 
 
     @Override
@@ -81,7 +76,9 @@ public class SpiderProcessor implements PageProcessor {
 
     @Override
     public Site getSite() {
-        Site site = Site.me().setRetryTimes(retryTimes).setSleepTime(sleepTime).setTimeOut(timeOut);
+        Site site = Site.me().setRetryTimes(spiderConfig.getRetryTimes())
+                .setSleepTime(spiderConfig.getSleepTime())
+                .setTimeOut(spiderConfig.getTimeOut());
         site.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
         site.addHeader("Accept-Encoding", "gzip, deflate");
         site.addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");

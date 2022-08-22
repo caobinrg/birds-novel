@@ -16,6 +16,7 @@ import org.redisson.api.RRemoteService;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.RemoteInvocationOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 
@@ -76,6 +77,7 @@ public class JobRemoteService {
                     .novelName(chapter.getNovelName())
                     .countDownSpace(chapterId)
                     .type(CrawlerTypeEnum.CONTENT.getType())
+                    .retry(true)
                     .build();
             request.putExtra(RequestConst.REQUEST_INFO,requestInfo);
             RRemoteService remoteService = redissonClient.getRemoteService();
@@ -93,6 +95,9 @@ public class JobRemoteService {
         return false;
     }
 
-
+    @Async
+    public void jumpGetContentAsync(Chapter chapter){
+        jumpGetContent(chapter);
+    }
 
 }

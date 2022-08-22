@@ -1,6 +1,9 @@
 package com.leqiwl.novel.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import com.leqiwl.novel.domain.entify.Novel;
 import com.leqiwl.novel.domain.entify.NovelConver;
 import com.leqiwl.novel.enums.RankTypeEnum;
 import com.leqiwl.novel.repository.NovelConverRepository;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +32,9 @@ public class NovelConverService {
     @Resource
     private MongoTemplate mongoTemplate;
 
+    @Resource
+    private NovelService novelService;
+
 
     public NovelConver getByNovelId(String novelId){
        return novelConverRepository.findByNovelId(novelId);
@@ -36,6 +43,19 @@ public class NovelConverService {
     public NovelConver save(NovelConver novelConver){
         NovelConver save = novelConverRepository.save(novelConver);
         return save;
+    }
+
+    public NovelConver generateConver(String novelId){
+        Novel novel = novelService.getByNovelId(novelId);
+        NovelConver novelConver = new NovelConver();
+        if(null == novel || StrUtil.isBlank(novel.getNovelId())){
+            return novelConver ;
+        }
+        BeanUtil.copyProperties(novel,novelConver);
+        Date date = new Date();
+        novelConver.setCreateTime(date);
+        novelConver.setUpdateTime(date);
+        return novelConver ;
     }
 
     @Cacheable(value = "novelConver#10m",key = "#rankType")

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    title=${'用户_' + webSiteName},
+    keywords=${'用户,' + webSiteKeywords},
+    description=${'用户,'+webSiteDescription})">
+    </head>
+    <style>
+        .img-box-title{
+            background-color:  rgba(0,0,0,0);
+            margin-bottom: 40px;
+        }
+        .weui-avatar, .weui-avatar-circle {
+            width: 90px;
+            height: 90px;
+            position: relative;
+        }
+        .weui-avatar-circle img{
+            height: 90px;
+            width: 90px;
+        }
+        .title-username{
+            text-align: center;
+        }
+        .title-username p{
+            font-size: 24px;
+            color: #5f646e;
+        }
+        .weui-cells{
+            margin-top: 0;
+
+        }
+        .btns{
+            margin-top: 180px;
+            padding: 10px 80px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="img-box">
+        <div class="img-box-title" >
+            <div class="weui-avatar-circle">
+                <img src="/static/mobile/img/dog.jpg">
+                <span class="weui-icon-success weui-icon-safe-warn"></span>
+            </div>
+            <div class="title-username">
+                <p th:text="${user.viewName}"></p>
+            </div>
+
+        </div>
+        <img src="/static/mobile/img/bg.jpg">
+    </div>
+
+
+    <div class="weui-cells">
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd"><div class="icon icon-91" style="width:20px;margin-right:5px;display:block"></div></div>
+            <div class="weui-cell__bd">
+                <p>我的消息</p>
+            </div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd"><div class="icon icon-104 " style="width:20px;margin-right:5px;display:block"></div></div>
+            <div class="weui-cell__bd">
+                <p>客服咨询</p>
+            </div>
+        </a>
+    </div>
+
+    <div>
+        <div class="btns" >
+            <a href="javascript:;" th:style="'display: ' + ${isLogin == true ? 'none' : 'block'}" id="loginBtn" class="weui-btn weui-btn_primary" onclick="login()">登录</a>
+            <a href="javascript:;" th:style="'display: ' + ${isLogin == true ? 'block' : 'none'}" id="logOutBtn" class="weui-btn weui-btn_primary" onclick="loginOut()">注销</a>
+
+        </div>
+    </div>
+
+
+</div>
+
+<div th:replace="mobile/common/login::login(true)"></div>
+<div th:replace="mobile/common/footer::tabbar(2)"></div>
+<div th:replace="mobile/common/footer::copyright"></div>
+
+<script th:inline="javascript">
+    var isLogin = [[${isLogin}]];
+    function login() {
+        $('#tb').hide();
+        $("#loginView").popup();
+    }
+    function loginPopClose() {
+        $('#tb').show()
+    }
+    function loginSuccess(userInfo) {
+        isLogin = true;
+        $('.title-username p').text(userInfo.viewName)
+        $("#loginBtn").hide();
+        $("#logOutBtn").show();
+    }
+    function registerSuccess(userInfo) {
+        $('.title-username p').text(userInfo.viewName)
+        $("#loginBtn").hide();
+        $("#logOutBtn").show();
+    }
+    function loginOut() {
+        $.ajax({
+            url: '/api/user/loginOut',
+            type: 'post',
+            data: {},
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (res) {
+                if(res!=undefined && res.success == true){
+                    isLogin = false;
+                    $('.title-username p').text('')
+                    $.toastFast("注销成功");
+                    $("#logOutBtn").hide();
+                    $("#loginBtn").show();
+                }else{
+                    $.toastFast("注销失败");
+                }
+            },
+            error: function () {
+                $.toastFast("出错了");
+            }
+        });
+    }
+</script>
+</body>
+
+
+</html>

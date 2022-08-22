@@ -6,6 +6,7 @@ import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.leqiwl.novel.common.enums.ClientTypeEnum;
 import com.leqiwl.novel.web.config.NovelWebMvcConfigurer;
+import com.leqiwl.novel.web.config.WebBaseUrlConfig;
 import com.leqiwl.novel.web.config.WebSiteConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * 通用配置(拦截器)
@@ -27,6 +29,9 @@ public class ViewInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private WebSiteConfig webSiteConfig;
+
+    @Autowired
+    private WebBaseUrlConfig webBaseUrlConfig;
 
 
     @Override
@@ -46,9 +51,11 @@ public class ViewInterceptor extends HandlerInterceptorAdapter {
             viewNamePrefix = ClientTypeEnum.MOBILE.getName();
             viewName = viewNamePrefix + "/" + viewName;
             modelAndView.setViewName(viewName);
-            modelAndView.getModel().put("webSiteName",webSiteConfig.getName());
-            modelAndView.getModel().put("webSiteKeyWords",webSiteConfig.getKeywords());
-            modelAndView.getModel().put("webSiteDescription",webSiteConfig.getDescription());
+            Map<String, Object> model = modelAndView.getModel();
+            model.put("webSiteName",webSiteConfig.getName());
+            model.put("webSiteKeyWords",webSiteConfig.getKeywords());
+            model.put("webSiteDescription",webSiteConfig.getDescription());
+            model.put("webBaseUrlConfig",webBaseUrlConfig);
         }
         super.postHandle(request, response, handler, modelAndView);
     }

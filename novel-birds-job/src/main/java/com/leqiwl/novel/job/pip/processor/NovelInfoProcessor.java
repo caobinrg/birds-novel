@@ -77,7 +77,10 @@ public class NovelInfoProcessor implements NovelProcessor{
                 return;
             }
         }
-        novel = getNovelInfo(page,requestInfo,crawlerInfo,html,null);
+        if(null == novel || null == novel.getId()){
+            novel = null;
+        }
+        novel = getNovelInfo(page,requestInfo,crawlerInfo,html,novel);
         //书籍信息持久化
         page.putField(CrawlerSaveTypeEnum.DETAIL.getType().toString(), novel);
     }
@@ -111,7 +114,11 @@ public class NovelInfoProcessor implements NovelProcessor{
         String lastUpdateMark = html.xpath(detailRule.getLastUpdateMarkRule()).toString();
         Date now = new Date();
         //最新章节
-        List<Chapter> novelChapters = CollectionUtil.reverseNew(chapterList).subList(0, 5);
+        int infoChapterSize = 5;
+        if(chapterList.size()<=5){
+            infoChapterSize = chapterList.size();
+        }
+        List<Chapter> novelChapters = new ArrayList<>(CollectionUtil.reverseNew(chapterList).subList(0, infoChapterSize));
         //字数
         String wordNum = "0";
         if(StrUtil.isNotBlank(detailRule.getWordNumRule())){
@@ -245,7 +252,7 @@ public class NovelInfoProcessor implements NovelProcessor{
         List<Chapter> chapterList = new ArrayList<>();
         if(null != novel && null != novel.getChapterList()){
             chapterList = chapterService.findByNovelId(novelId);
-            chapterMap = chapterList.stream().collect(Collectors.toMap(Chapter::getIdMark, Chapter -> Chapter ));
+            chapterMap = chapterList.stream().collect(Collectors.toMap(Chapter::getIdMark, Chapter -> Chapter ,(v1, v2) -> v1));
             if(chapterList.size() != chapterMap.size()){
                 //todo 处理重复章节
             }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>footer</title>
+</head>
+<body>
+
+    <div th:fragment="tabbar(index)">
+        <div id="tb">
+            <div class="weui-tabbar tab-bottom">
+                <a th:href="${webBaseUrlConfig.home}" class="weui-tabbar__item">
+                    <i class="icon icon-27 f27 weui-tabbar__icon"></i>
+                    <p class="weui-tabbar__label">书城</p>
+                </a>
+                <a th:href="${webBaseUrlConfig.bookrack}" class="weui-tabbar__item">
+                    <i class="icon icon-93 f27 weui-tabbar__icon"></i>
+                    <p class="weui-tabbar__label">书架</p>
+                </a>
+                <a th:href="${webBaseUrlConfig.user}" class="weui-tabbar__item ">
+                    <i class="icon icon-85 f27 weui-tabbar__icon" ></i>
+                    <p class="weui-tabbar__label">我的</p>
+                </a>
+            </div>
+
+        </div>
+        <script>
+            $(function(){
+                $('#tb').tab({
+                    defaultIndex: [[${index}]],
+                    activeClass: 'weui-bar__item_on',
+                })
+            })
+        </script>
+
+    </div>
+
+
+
+    <div th:fragment="copyright">
+<!--        © 2016 xxx-->
+    </div>
+</body>
+</html>
