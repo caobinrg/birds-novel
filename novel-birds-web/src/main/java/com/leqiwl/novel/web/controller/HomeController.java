@@ -1,11 +1,15 @@
 package com.leqiwl.novel.web.controller;
 
 import com.leqiwl.novel.common.util.EntityToDtoUtil;
+import com.leqiwl.novel.domain.dto.NovelConverOutDto;
 import com.leqiwl.novel.domain.dto.NovelInfoOutDto;
 import com.leqiwl.novel.domain.dto.NovelSetOutDto;
 import com.leqiwl.novel.domain.entify.Novel;
+import com.leqiwl.novel.domain.entify.NovelConver;
 import com.leqiwl.novel.domain.entify.NovelSet;
 import com.leqiwl.novel.enums.NovelSetTypeEnum;
+import com.leqiwl.novel.enums.RankTypeEnum;
+import com.leqiwl.novel.service.NovelConverService;
 import com.leqiwl.novel.service.NovelService;
 import com.leqiwl.novel.service.NovelSetService;
 import org.springframework.stereotype.Controller;
@@ -32,6 +36,9 @@ public class HomeController {
     @Resource
     private NovelService novelService;
 
+    @Resource
+    private NovelConverService novelConverService;
+
 
     @GetMapping({"/",""})
     public String getHome(Model model) throws InstantiationException, IllegalAccessException {
@@ -45,6 +52,10 @@ public class HomeController {
         List<NovelSet> shortagesNovelSet = novelSetService.getByRandom(NovelSetTypeEnum.SH.getName());
         List<NovelSetOutDto> shortages = EntityToDtoUtil.parseDataListWithUrl(shortagesNovelSet, NovelSetOutDto.class);
         novels.put("shortage",shortages);
+        List<NovelConver> novelConvers = novelConverService.getByRankType(RankTypeEnum.Click.getType());
+        List<NovelConverOutDto> novelConverOutDtos =
+                EntityToDtoUtil.parseDataListWithUrl(novelConvers, NovelConverOutDto.class);
+        novels.put("clickRank",novelConverOutDtos);
         model.addAttribute("novels",novels);
         return "home";
     }
