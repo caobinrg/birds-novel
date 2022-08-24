@@ -15,4 +15,6 @@ public interface ChapterRepository extends MongoRepository<Chapter, String>{
 
     List<Chapter> findChapterByNovelIdOrderByChapterIndex(String novelId);
 
+    Chapter findChapterByChapterId(String chapterId);
+
 }

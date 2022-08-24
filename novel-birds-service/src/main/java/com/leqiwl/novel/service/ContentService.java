@@ -34,6 +34,9 @@ public class ContentService {
     @Resource
     private JobRemoteService jobRemoteService;
 
+    @Resource
+    private CrawlerRuleService crawlerRuleService;
+
 
     @Value("${contentError.textError}")
     private String contentTextError;
@@ -98,7 +101,8 @@ public class ContentService {
                 contentOutDto.setHasDataFlag(true);
                 String contentText = content.getContentText();
                 if(contentText.contains("重新刷新页面")){
-                    jobRemoteService.jumpGetContentAsync(chapter);
+                    contentText = getContentTextByPassThrough(chapter,contentText);
+                    contentOutDto.setContentText(contentText);
                 }
             }else{
                 //未找到章节内容
@@ -117,6 +121,21 @@ public class ContentService {
         return contentOutDto;
     }
 
-
-
+    /**
+     * 透传获取内容
+     * @return
+     */
+    private String getContentTextByPassThrough(Chapter chapter,String contentText){
+        try {
+            String contentTextByPassThrough = crawlerRuleService.getContentTextByPassThrough(chapter);
+            if(!contentText.equals(contentTextByPassThrough)){
+                //发送重新采集消息
+                jobRemoteService.jumpGetContentAsync(chapter);
+            }
+            return contentTextByPassThrough;
+        }catch (Exception e){
+            log.info(e.getMessage(),e);
+        }
+        return contentText;
+    }
 }

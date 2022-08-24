@@ -73,4 +73,8 @@ public class ChapterService {
         return new Chapter();
     }
 
+    public Chapter getByChapterId(String chapterId){
+       return  chapterRepository.findChapterByChapterId(chapterId);
+    }
+
 }
