@@ -100,7 +100,7 @@ public class ContentService {
                 contentOutDto = EntityToDtoUtil.parseDataWithUrl(content,contentOutDto);
                 contentOutDto.setHasDataFlag(true);
                 String contentText = content.getContentText();
-                if(contentText.contains("重新刷新页面")){
+                if(contentText.contains("重新刷新页面") ||contentText.contains("努力更新ing")){
                     contentText = getContentTextByPassThrough(chapter,contentText);
                     contentOutDto.setContentText(contentText);
                 }
