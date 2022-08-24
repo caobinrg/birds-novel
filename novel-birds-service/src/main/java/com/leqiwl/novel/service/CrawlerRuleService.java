@@ -317,7 +317,15 @@ public class CrawlerRuleService {
         String novelContentHtmlStr = HttpUtil.get(chapterUrl);
         Html novelContentHtml = new Html(novelContentHtmlStr);
         CrawlerContentRule contentRule = rule.getContentRule();
-        String contentText = novelContentHtml.xpath(contentRule.getContentTextRule()).toString();
+        List<String> contentOutLabelRule = contentRule.getContentOutLabelRule();
+        Selectable htmlXpath = novelContentHtml.xpath("");
+        if(CollectionUtil.isNotEmpty(contentOutLabelRule)){
+            for (String label : contentOutLabelRule) {
+                String labelValue = "<"+label+"([\\s\\S]*?)"+label+">";
+                htmlXpath = htmlXpath.replace(labelValue,"");
+            }
+        }
+        String contentText = new Html(htmlXpath.toString()).xpath(contentRule.getContentTextRule()).toString();
         List<String> contentOutStrs = contentRule.getContentOutStr();
         if(CollectionUtil.isNotEmpty(contentOutStrs)){
             for (String contentOutStr : contentOutStrs) {
