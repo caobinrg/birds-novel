@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    ${'分类排行_'  + webSiteName},
+    ${'分类排行_'  + webSiteName},
+    ${'分类排行_'  + webSiteName})">
+        <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
+    </head>
+    <style>
+        .classify-content{
+            padding-bottom: 4em;
+        }
+        .weui-tab-content{
+            padding-top: 53px;
+        }
+        .weui-navbar{
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="classify-content">
+
+
+    <div class="weui-tab" id="t1">
+        <div class="weui-navbar">
+            <div class="weui-navbar__item">
+                分类
+            </div>
+            <div class="weui-navbar__item">
+                排行
+            </div>
+        </div>
+    </div>
+
+
+    <div class="weui-tab-content">
+        <div class="weui-tab-content-item">
+            <div th:each="item:${novelTypes}" th:if="${#lists.size(item.value.data) > 0}">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        &nbsp;[[${item.key}]]
+                    </div>
+                </div>
+                <div class="weui-panel__bd" th:each="novelInfoOutDto,status:${item.value.data}">
+                    <a th:href="${novelInfoOutDto.novelUrl}" th:if="${novelInfoOutDto.name != null and status.index < 5}" class="weui-media-box weui-media-box_appmsg">
+                        <div class="weui-media-box__hd">
+                            <img class="weui-media-box__thumb lazy" th:src="${novelInfoOutDto.image}"  onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                        </div>
+                        <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title"> [[${novelInfoOutDto.name}]] </h4>
+                            <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelInfoOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelInfoOutDto.intro,'<br/>','')}"></p>
+                            <p class="page-hd-desc">[[${novelInfoOutDto.author}]]</p>
+                        </div>
+                    </a>
+                </div>
+
+
+            </div>
+
+
+
+        </div>
+        <div class="weui-tab-content-item">
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+    <div th:replace="mobile/common/footer::tabbar(1)"></div>
+    <div th:replace="mobile/common/footer::copyright"></div>
+    <div th:replace="mobile/common/search::search"></div>
+</div>
+
+</body>
+<script th:inline="javascript">
+    $('#t1').tab({
+        defaultIndex: 0,
+        activeClass: 'tab-green',
+        onToggle: function (index) {
+            var tabContents = $(".weui-tab-content").children();
+            $.each(tabContents,function (itemIndex,item) {
+                if(itemIndex === index){
+                    $(item).show();
+                    return true;
+                }
+                $(item).hide();
+            });
+        }
+    })
+
+
+
+</script>
+</html>

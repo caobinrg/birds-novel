@@ -4,6 +4,7 @@ mapping:
   index: "/web"
   home: "/web/home"
   page: "/web/page"
+  classify: "/web/classify"
   bookrack: "/web/bookrack"
   user: "/web/user"
 website:

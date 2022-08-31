@@ -2,8 +2,11 @@ package com.leqiwl.novel.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.leqiwl.novel.common.util.EntityToDtoUtil;
 import com.leqiwl.novel.domain.dto.NovelInfoByNameInDto;
 import com.leqiwl.novel.domain.dto.NovelInfoByTypeInDto;
+import com.leqiwl.novel.domain.dto.NovelInfoByTypeOutDto;
+import com.leqiwl.novel.domain.dto.NovelInfoOutDto;
 import com.leqiwl.novel.domain.entify.Novel;
 import com.leqiwl.novel.repository.NovelRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -119,6 +122,24 @@ public class NovelService {
         }
         return result;
     }
+
+
+    @Cacheable(cacheNames = "novelTypePage#10m",key = "#type")
+    public NovelInfoByTypeOutDto getNovelByTypeWithPage(String type)
+            throws InstantiationException, IllegalAccessException {
+        NovelInfoByTypeInDto novelInfoByTypeInDto = new NovelInfoByTypeInDto();
+        novelInfoByTypeInDto.setNovelType(type);
+        NovelInfoByTypeOutDto novelInfoByTypeOutDto = new NovelInfoByTypeOutDto();
+        Page<Novel> novelPage = getNovelByType(novelInfoByTypeInDto);
+        List<Novel> novels = novelPage.getContent();
+        long totalElements = novelPage.getTotalElements();
+        novelInfoByTypeOutDto.setPageNo(novelInfoByTypeInDto.getPageNo());
+        novelInfoByTypeOutDto.setPageSize(novelInfoByTypeInDto.getPageSize());
+        novelInfoByTypeOutDto.setData(EntityToDtoUtil.parseDataListWithUrl(novels, NovelInfoOutDto.class));
+        novelInfoByTypeOutDto.setTotal(totalElements);
+        return novelInfoByTypeOutDto;
+    }
+
 
 
     public Page<Novel> getNovelByType(NovelInfoByTypeInDto dto){

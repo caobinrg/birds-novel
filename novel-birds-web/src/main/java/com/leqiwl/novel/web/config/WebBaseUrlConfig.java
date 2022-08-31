@@ -18,6 +18,8 @@ public class WebBaseUrlConfig {
 
     private String page;
 
+    private String classify;
+
     private String bookrack;
 
     private String user;
