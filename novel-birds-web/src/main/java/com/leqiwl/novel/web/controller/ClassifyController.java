@@ -51,7 +51,7 @@ public class ClassifyController {
         //点击
         model.addAttribute("clickRank",getRank(RankTypeEnum.Click));
         //阅读
-        model.addAttribute("readRank",getRank(RankTypeEnum.Read));
+        model.addAttribute("readRank",getRankWithSkip(RankTypeEnum.Read,20));
         //收藏
         model.addAttribute("starRank",getRank(RankTypeEnum.STAR));
         return "classify";
@@ -62,4 +62,11 @@ public class ClassifyController {
         List<NovelConver> novelConvers = novelConverService.getByRankType(rankTypeEnum.getType());
         return EntityToDtoUtil.parseDataListWithUrl(novelConvers, NovelConverOutDto.class);
     }
+
+    private List<NovelConverOutDto> getRankWithSkip(RankTypeEnum rankTypeEnum,int skip)
+            throws InstantiationException, IllegalAccessException {
+        List<NovelConver> novelConvers = novelConverService.getByRankTypeWithSkip(rankTypeEnum.getType(),skip);
+        return EntityToDtoUtil.parseDataListWithUrl(novelConvers, NovelConverOutDto.class);
+    }
+
 }

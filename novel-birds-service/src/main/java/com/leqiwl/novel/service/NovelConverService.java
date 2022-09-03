@@ -73,4 +73,19 @@ public class NovelConverService {
         return novelConvers;
     }
 
+    @Cacheable(value = "novelConver#10m",key = "#rankType")
+    public List<NovelConver> getByRankTypeWithSkip(int rankType,int skip){
+        RankTypeEnum rankTypeEnum = RankTypeEnum.getByType(rankType);
+        if(null == rankTypeEnum){
+            return new ArrayList<>();
+        }
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC,rankTypeEnum.getColumn())).skip(skip).limit(20);
+        List<NovelConver> novelConvers = mongoTemplate.find(query, NovelConver.class);
+        if(CollectionUtil.isEmpty(novelConvers)){
+            return new ArrayList<>();
+        }
+        return novelConvers;
+    }
+
 }
