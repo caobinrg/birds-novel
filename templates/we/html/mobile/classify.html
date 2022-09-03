@@ -43,6 +43,9 @@
             height:100%;
             overflow:auto;
         }
+        .classify-rank-tab-content{
+          display: none;
+        }
     </style>
 </head>
 <body>
@@ -90,8 +93,8 @@
         <!--        分类结束-->
 
         <!--        排行开始-->
-        <div class="weui-tab-content-item">
-            <div class="weui-flex">
+        <div class="weui-tab-content-item ">
+            <div class="weui-flex classify-rank-tab-content">
                 <div class="weui-flex__item">
                     <div class="placeholder">
                         <div class="weui-tab" id="t2">
@@ -217,6 +220,7 @@
             });
         }
     })
+    $('.classify-rank-tab-content').removeClass('classify-rank-tab-content')
 
 
 </script>
