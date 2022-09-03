@@ -7,27 +7,27 @@
 <body>
 
 <!--内嵌广告位-通用-->
-<div th:fragment="adsInset">
+<div class="adsCommon" th:fragment="adsInset" th:if="${webAds}">
 
 </div>
 
 <!--内嵌广告位-首页-->
-<div th:fragment="adsHome">
+<div class="adsHome" th:fragment="adsHome" th:if="${webAds}">
 
 </div>
 
 <!--广告位-书籍-->
-<div th:fragment="adsBook">
+<div class="adsBook" th:fragment="adsBook" th:if="${webAds}">
 
 </div>
 
 <!--广告位-书架-->
-<div th:fragment="adsBookRack">
+<div class="adsBookRack" th:fragment="adsBookRack" th:if="${webAds}">
 
 </div>
 
 <!--广告位-阅读-->
-<div th:fragment="adsRead">
+<div class="adsRead" th:fragment="adsRead" th:if="${webAds}">
 
 </div>
 
