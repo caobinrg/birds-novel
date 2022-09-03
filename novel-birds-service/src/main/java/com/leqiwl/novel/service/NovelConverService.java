@@ -58,7 +58,7 @@ public class NovelConverService {
         return novelConver ;
     }
 
-    @Cacheable(value = "novelConver#10m",key = "#rankType")
+    @Cacheable(value = "novelConver#24h",key = "#rankType")
     public List<NovelConver> getByRankType(int rankType){
         RankTypeEnum rankTypeEnum = RankTypeEnum.getByType(rankType);
         if(null == rankTypeEnum){
@@ -73,7 +73,7 @@ public class NovelConverService {
         return novelConvers;
     }
 
-    @Cacheable(value = "novelConver#10m",key = "#rankType")
+    @Cacheable(value = "novelConver#24h",key = "#rankType")
     public List<NovelConver> getByRankTypeWithSkip(int rankType,int skip){
         RankTypeEnum rankTypeEnum = RankTypeEnum.getByType(rankType);
         if(null == rankTypeEnum){
