@@ -99,7 +99,7 @@ public class NovelService {
         return novel;
     }
 
-    @Cacheable(cacheNames = "novelLast#10m")
+    @Cacheable(cacheNames = "novelLast#1h")
     public List<Novel> getLastUpdate(){
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC,"updateTime")).limit(6);
@@ -124,7 +124,7 @@ public class NovelService {
     }
 
 
-    @Cacheable(cacheNames = "novelTypePage#10m",key = "#type")
+    @Cacheable(cacheNames = "novelTypePage#1h",key = "#type")
     public NovelInfoByTypeOutDto getNovelByTypeWithPage(String type)
             throws InstantiationException, IllegalAccessException {
         NovelInfoByTypeInDto novelInfoByTypeInDto = new NovelInfoByTypeInDto();

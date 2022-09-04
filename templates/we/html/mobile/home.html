@@ -92,7 +92,8 @@
         <div id="storageView">
             <a th:href="${novelSetOutDto.novelUrl}" th:each="novelSetOutDto:${novels.shortage}" class="grid">
                 <div class="weui-grid__icon">
-                    <img th:src="${novelSetOutDto.image}" th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                    <img class="lazy" src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                         th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
                 </div>
                 <p class="weui-grid__label">
                     [[${novelSetOutDto.name}]]
@@ -130,7 +131,8 @@
     <div class="weui-panel__bd" th:each="novelSetOutDto,status:${novels.clickRank}">
         <a th:href="${novelSetOutDto.novelUrl}" th:if="${novelSetOutDto.name != null and status.index < 5}" class="weui-media-box weui-media-box_appmsg">
             <div class="weui-media-box__hd">
-                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}"  onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                <img class="weui-media-box__thumb lazy"  src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                     onerror="javascript:this.src='/static/mobile/img/default.jpg'">
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
@@ -158,7 +160,8 @@
     <div class="weui-panel__bd" th:each="novelSetOutDto:${novels.recommend}">
         <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
             <div class="weui-media-box__hd">
-                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                <img class="weui-media-box__thumb lazy"   th:attr="data-echo=${novelSetOutDto.image}"
+                     th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
@@ -185,7 +188,8 @@
     <div class="weui-panel__bd update_content" th:each="novelSetOutDto:${novels.update}">
         <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
             <div class="weui-media-box__hd">
-                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                <img class="weui-media-box__thumb lazy"  src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                     th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title">[[${novelSetOutDto.name}]]</h4>
@@ -252,7 +256,9 @@
     function enableScroll() {
         $(document.body).css({"overflow-y": "auto"});
     }
-
+    $("img.lazy").each(function () {
+        $(this).attr("src",$(this).attr("data-echo"))
+    })
 </script>
 
 
