@@ -29,6 +29,8 @@ public class NovelWebMvcConfigurer implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/static/**")
                 .addResourceLocations(staticResource);
+        registry.addResourceHandler("/favicon.ico")//favicon.ico
+                .addResourceLocations(staticResource);
         if(!novelImagePath.endsWith("/")){
             novelImagePath = novelImagePath + "/";
         }
