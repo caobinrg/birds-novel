@@ -58,7 +58,7 @@ public class NovelConverService {
         return novelConver ;
     }
 
-    @Cacheable(value = "novelConver#10m",key = "#rankType")
+    @Cacheable(value = "novelConver#24h",key = "#rankType")
     public List<NovelConver> getByRankType(int rankType){
         RankTypeEnum rankTypeEnum = RankTypeEnum.getByType(rankType);
         if(null == rankTypeEnum){
@@ -66,6 +66,21 @@ public class NovelConverService {
         }
         Query query = new Query();
         query.with(Sort.by(Sort.Direction.DESC,rankTypeEnum.getColumn())).limit(20);
+        List<NovelConver> novelConvers = mongoTemplate.find(query, NovelConver.class);
+        if(CollectionUtil.isEmpty(novelConvers)){
+            return new ArrayList<>();
+        }
+        return novelConvers;
+    }
+
+    @Cacheable(value = "novelConver#24h",key = "#rankType")
+    public List<NovelConver> getByRankTypeWithSkip(int rankType,int skip){
+        RankTypeEnum rankTypeEnum = RankTypeEnum.getByType(rankType);
+        if(null == rankTypeEnum){
+            return new ArrayList<>();
+        }
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC,rankTypeEnum.getColumn())).skip(skip).limit(20);
         List<NovelConver> novelConvers = mongoTemplate.find(query, NovelConver.class);
         if(CollectionUtil.isEmpty(novelConvers)){
             return new ArrayList<>();

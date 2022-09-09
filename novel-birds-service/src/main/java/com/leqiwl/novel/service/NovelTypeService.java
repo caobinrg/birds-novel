@@ -50,6 +50,7 @@ public class NovelTypeService {
         return  this.getTypeMap(all);
     }
 
+    @Cacheable(cacheNames = "novelTypeList#24h", key="'novelTypeList'")
     public List<NovelType> getNovelTypes(){
         List<NovelType> all = novelTypeRepository.findAll();
         if(CollectionUtil.isEmpty(all)){

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <head th:replace="mobile/common/header :: common_header(
-    title=${'书城_' + webSiteName},
+    title=${'热门小说_' + webSiteName},
     keywords=${'书城,' + webSiteKeyWords},
     description=${'书城,'+webSiteDescription})">
     </head>
@@ -59,6 +59,9 @@
             line-height: 2.2 !important;
             margin-left: 5px
         }
+        .weui-media-box__title{
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +92,8 @@
         <div id="storageView">
             <a th:href="${novelSetOutDto.novelUrl}" th:each="novelSetOutDto:${novels.shortage}" class="grid">
                 <div class="weui-grid__icon">
-                    <img th:src="${novelSetOutDto.image}" alt="">
+                    <img class="lazy" src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                         th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
                 </div>
                 <p class="weui-grid__label">
                     [[${novelSetOutDto.name}]]
@@ -104,7 +108,7 @@
         {{#each shortage}}
         <a href="{{novelUrl}}"  class="grid">
             <div class="weui-grid__icon">
-                <img src="{{image}}" alt="">
+                <img src="{{image}}" th:alt="${webSiteKeyWords}">
             </div>
             <p class="weui-grid__label">
                 {{name}}
@@ -114,22 +118,21 @@
     </script>
 
 
-
-
     <div class="weui-cell">
         <div class="weui-cell__hd">
             <i class="icon icon-65 f25 weui-tabbar__icon" ></i>
         </div>
         <div class="weui-cell__bd">
-            &nbsp;站长推荐
+            &nbsp;热门小说
         </div>
     </div>
 
 
-    <div class="weui-panel__bd" th:each="novelSetOutDto:${novels.recommend}">
-        <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+    <div class="weui-panel__bd" th:each="novelSetOutDto,status:${novels.clickRank}">
+        <a th:href="${novelSetOutDto.novelUrl}" th:if="${novelSetOutDto.name != null and status.index < 5}" class="weui-media-box weui-media-box_appmsg">
             <div class="weui-media-box__hd">
-                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" alt="">
+                <img class="weui-media-box__thumb lazy"  src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                     onerror="javascript:this.src='/static/mobile/img/default.jpg'">
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
@@ -146,6 +149,34 @@
 
     <div class="weui-cell">
         <div class="weui-cell__hd">
+            <i class="icon icon-65 f25 weui-tabbar__icon" ></i>
+        </div>
+        <div class="weui-cell__bd">
+            &nbsp;站长推荐
+        </div>
+    </div>
+
+
+    <div class="weui-panel__bd" th:each="novelSetOutDto:${novels.recommend}">
+        <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-media-box__hd">
+                <img class="weui-media-box__thumb lazy"   th:attr="data-echo=${novelSetOutDto.image}"
+                     th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+            </div>
+            <div class="weui-media-box__bd">
+                <h4 class="weui-media-box__title"> [[${novelSetOutDto.name}]] </h4>
+                <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelSetOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelSetOutDto.intro,'<br/>','')}"></p>
+                <p class="page-hd-desc">[[${novelSetOutDto.author}]]</p>
+            </div>
+        </a>
+    </div>
+
+
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
             <i class="icon icon-91 f25 weui-tabbar__icon" ></i>
         </div>
         <div class="weui-cell__bd">
@@ -157,7 +188,8 @@
     <div class="weui-panel__bd update_content" th:each="novelSetOutDto:${novels.update}">
         <a th:href="${novelSetOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
             <div class="weui-media-box__hd">
-                <img class="weui-media-box__thumb lazy" th:src="${novelSetOutDto.image}" alt="">
+                <img class="weui-media-box__thumb lazy"  src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelSetOutDto.image}"
+                     th:alt="${webSiteKeyWords}" onerror="javascript:this.src='/static/mobile/img/default.jpg'">
             </div>
             <div class="weui-media-box__bd">
                 <h4 class="weui-media-box__title">[[${novelSetOutDto.name}]]</h4>
@@ -224,7 +256,9 @@
     function enableScroll() {
         $(document.body).css({"overflow-y": "auto"});
     }
-
+    $("img.lazy").each(function () {
+        $(this).attr("src",$(this).attr("data-echo"))
+    })
 </script>
 
 

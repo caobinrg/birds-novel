@@ -14,6 +14,8 @@ import com.leqiwl.novel.config.sysconst.RequestConst;
 import com.leqiwl.novel.domain.dto.CrawlerRuleEditInDto;
 import com.leqiwl.novel.domain.dto.XpathTestInDto;
 import com.leqiwl.novel.domain.dto.XpathTestOutDto;
+import com.leqiwl.novel.domain.entify.Chapter;
+import com.leqiwl.novel.domain.entify.Content;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerContentRule;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerDetailRule;
 import com.leqiwl.novel.domain.entify.crawler.CrawlerListRule;
@@ -52,6 +54,9 @@ public class CrawlerRuleService {
 
     @Resource
     private JobRemoteService jobRemoteService;
+
+    @Resource
+    private ChapterService chapterService;
 
     @Cacheable(cacheNames = "rule#10m", key = "'all'")
     public List<CrawlerRule> getAll(){
@@ -303,6 +308,31 @@ public class CrawlerRuleService {
         }finally {
             return result.toString();
         }
+    }
+
+    public String getContentTextByPassThrough(Chapter chapter){
+        String chapterUrl = chapter.getChapterUrl();
+        String ruleId = chapter.getRuleId();
+        CrawlerRule rule = getByRuleId(ruleId);
+        String novelContentHtmlStr = HttpUtil.get(chapterUrl);
+        Html novelContentHtml = new Html(novelContentHtmlStr);
+        CrawlerContentRule contentRule = rule.getContentRule();
+        List<String> contentOutLabelRule = contentRule.getContentOutLabelRule();
+        Selectable htmlXpath = novelContentHtml.xpath("");
+        if(CollectionUtil.isNotEmpty(contentOutLabelRule)){
+            for (String label : contentOutLabelRule) {
+                String labelValue = "<"+label+"([\\s\\S]*?)"+label+">";
+                htmlXpath = htmlXpath.replace(labelValue,"");
+            }
+        }
+        String contentText = new Html(htmlXpath.toString()).xpath(contentRule.getContentTextRule()).toString();
+        List<String> contentOutStrs = contentRule.getContentOutStr();
+        if(CollectionUtil.isNotEmpty(contentOutStrs)){
+            for (String contentOutStr : contentOutStrs) {
+                contentText = contentText.replace(contentOutStr,"");
+            }
+        }
+        return contentText;
     }
 
 

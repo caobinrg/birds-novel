@@ -56,10 +56,22 @@ public class ViewInterceptor extends HandlerInterceptorAdapter {
             model.put("webSiteKeyWords",webSiteConfig.getKeywords());
             model.put("webSiteDescription",webSiteConfig.getDescription());
             model.put("webBaseUrlConfig",webBaseUrlConfig);
+            model.put("webAds",judgeAds(request));
         }
         super.postHandle(request, response, handler, modelAndView);
     }
 
+
+    private boolean judgeAds(HttpServletRequest request){
+        String userAgentString = request.getHeader("User-Agent");
+        String lowerCaseUa = userAgentString.toLowerCase();
+        if(lowerCaseUa.contains("spider") ||
+                lowerCaseUa.contains("bot") ||
+                lowerCaseUa.contains("crawler")){
+            return false;
+        }
+        return true;
+    }
 
     private boolean judgeMobile(HttpServletRequest request){
         String userAgentString = request.getHeader("User-Agent");

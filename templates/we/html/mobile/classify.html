@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head th:replace="mobile/common/header :: common_header(
+    ${'分类排行_'  + webSiteName},
+    ${'分类排行_'  + webSiteName},
+    ${'分类排行_'  + webSiteName})">
+        <!--/*@thymesVar id="novel" type="com.leqiwl.novel.domain.dto.NovelInfoOutDto"*/-->
+    </head>
+    <style>
+        .classify-content{
+            padding-bottom: 4em;
+        }
+        .classify-tab-content{
+            padding-top: 53px;
+        }
+        .weui-navbar{
+            background-color: white;
+        }
+        .weui-media-box_appmsg .weui-media-box__thumb {
+            width: auto;
+            vertical-align: top;
+        }
+        .weui-media-box_appmsg .weui-media-box__hd {
+            margin-right: 0.8em;
+            width: 64px;
+            height: 75px;
+            line-height: 60px;
+            text-align: center;
+        }
+        .weui-media-box{
+            padding: 8px;
+        }
+        .weui-media-box__title{
+            font-size: 15px;
+        }
+        .rank-navbar{
+            flex-direction: column;
+        }
+        .rank-item{
+            height:100%;
+            overflow:auto;
+        }
+        .classify-rank-tab-content{
+          display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="classify-content">
+
+
+    <div class="weui-tab" id="t1">
+        <div class="weui-navbar">
+            <div class="weui-navbar__item">
+                分类
+            </div>
+            <div class="weui-navbar__item">
+                排行
+            </div>
+        </div>
+    </div>
+
+
+    <div class="weui-tab-content classify-tab-content">
+        <!--        分类开始-->
+        <div class="weui-tab-content-item">
+            <div th:each="item:${novelTypes}" th:if="${#lists.size(item.value.data) > 0}">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        &nbsp;[[${item.key}]]
+                    </div>
+                </div>
+                <div class="weui-panel__bd" th:each="novelInfoOutDto,status:${item.value.data}">
+                    <a th:href="${novelInfoOutDto.novelUrl}" th:if="${novelInfoOutDto.name != null and status.index < 5}" class="weui-media-box weui-media-box_appmsg">
+                        <div class="weui-media-box__hd">
+                            <img class="weui-media-box__thumb lazy" src="/static/mobile/img/default.jpg" th:attr="data-echo=${novelInfoOutDto.image}"
+                                 onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                        </div>
+                        <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title"> [[${novelInfoOutDto.name}]] </h4>
+                            <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(novelInfoOutDto.intro)} ?
+                 暂无描述 :
+                  ${#strings.replace(novelInfoOutDto.intro,'<br/>','')}"></p>
+                            <p class="page-hd-desc">[[${novelInfoOutDto.author}]]</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        <!--        分类结束-->
+
+        <!--        排行开始-->
+        <div class="weui-tab-content-item ">
+            <div class="weui-flex classify-rank-tab-content">
+                <div class="weui-flex__item">
+                    <div class="placeholder">
+                        <div class="weui-tab" id="t2">
+                            <div class="weui-navbar rank-navbar">
+                                <div class="weui-navbar__item">
+                                    收藏榜
+                                </div>
+                                <div class="weui-navbar__item">
+                                    阅读榜
+                                </div>
+                                <div class="weui-navbar__item">
+                                    点击榜
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-flex__item2 rank-item" >
+                    <div class="placeholder">
+                        <div class="weui-tab-content rank-tab-content">
+
+
+                            <div class="weui-tab-content-item">
+                                <div class="weui-panel__bd" th:each="NovelConverOutDto,status:${starRank}">
+                                    <a th:href="${NovelConverOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+                                        <div class="weui-media-box__hd">
+                                            <img class="weui-media-box__thumb lazy" src="/static/mobile/img/default.jpg"  th:attr="data-echo=${NovelConverOutDto.image}"
+                                                 onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                                        </div>
+                                        <div class="weui-media-box__bd">
+                                            <h4 class="weui-media-box__title"> [[${NovelConverOutDto.name}]] </h4>
+                                            <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(NovelConverOutDto.intro)} ?
+                                         暂无描述 :
+                                          ${#strings.replace(NovelConverOutDto.intro,'<br/>','')}"></p>
+                                            <p class="page-hd-desc">[[${NovelConverOutDto.author}]]</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+
+                            <div class="weui-tab-content-item">
+                                <div class="weui-panel__bd" th:each="NovelConverOutDto,status:${readRank}">
+                                    <a th:href="${NovelConverOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+                                        <div class="weui-media-box__hd">
+                                            <img class="weui-media-box__thumb lazy" src="/static/mobile/img/default.jpg"  th:attr="data-echo=${NovelConverOutDto.image}"
+                                                 onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                                        </div>
+                                        <div class="weui-media-box__bd">
+                                            <h4 class="weui-media-box__title"> [[${NovelConverOutDto.name}]] </h4>
+                                            <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(NovelConverOutDto.intro)} ?
+                                         暂无描述 :
+                                          ${#strings.replace(NovelConverOutDto.intro,'<br/>','')}"></p>
+                                            <p class="page-hd-desc">[[${NovelConverOutDto.author}]]</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="weui-tab-content-item">
+                                <div class="weui-panel__bd" th:each="NovelConverOutDto,status:${clickRank}">
+                                    <a th:href="${NovelConverOutDto.novelUrl}" class="weui-media-box weui-media-box_appmsg">
+                                        <div class="weui-media-box__hd">
+                                            <img class="weui-media-box__thumb lazy" src="/static/mobile/img/default.jpg"  th:attr="data-echo=${NovelConverOutDto.image}"
+                                                 onerror="javascript:this.src='/static/mobile/img/default.jpg'">
+                                        </div>
+                                        <div class="weui-media-box__bd">
+                                            <h4 class="weui-media-box__title"> [[${NovelConverOutDto.name}]] </h4>
+                                            <p class="weui-media-box__desc"  th:text="${#strings.isEmpty(NovelConverOutDto.intro)} ?
+                                         暂无描述 :
+                                          ${#strings.replace(NovelConverOutDto.intro,'<br/>','')}"></p>
+                                            <p class="page-hd-desc">[[${NovelConverOutDto.author}]]</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        排行结束-->
+    </div>
+
+
+
+
+    <div th:replace="mobile/common/footer::tabbar(1)"></div>
+    <div th:replace="mobile/common/footer::copyright"></div>
+    <div th:replace="mobile/common/search::search"></div>
+
+
+
+
+</div>
+</body>
+<script th:inline="javascript">
+    $('#t1').tab({
+        defaultIndex: 0,
+        activeClass: 'tab-green',
+        onToggle: function (index) {
+            var tabContents = $(".classify-tab-content").children();
+            $.each(tabContents,function (itemIndex,item) {
+                if(itemIndex === index){
+                    $(item).show();
+                    return true;
+                }
+                $(item).hide();
+            });
+        }
+    })
+    $('#t2').tab({
+        defaultIndex: 0,
+        activeClass: 'tab-green',
+        onToggle: function (index) {
+            var rankTabContents = $(".rank-tab-content").children();
+            $.each(rankTabContents,function (itemIndex,item) {
+                if(itemIndex === index){
+                    $(item).show();
+                    return true;
+                }
+                $(item).hide();
+            });
+        }
+    })
+    $('.classify-rank-tab-content').removeClass('classify-rank-tab-content')
+    $("img.lazy").each(function () {
+        $(this).attr("src",$(this).attr("data-echo"))
+    })
+
+</script>
+</html>
