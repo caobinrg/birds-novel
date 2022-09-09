@@ -7,7 +7,9 @@ import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
@@ -25,9 +27,11 @@ public class ResponseAopLogComponent implements ResponseBodyAdvice {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-
+        RequestMapping requestMapping = returnType.getMethodAnnotation(RequestMapping.class);
         if (body instanceof ApiResult) {
-            log.info("请求返回:{}", JSON.toJSONString(body));
+//            log.info("请求返回:{}", JSON.toJSONString(body));
+//            log.info("请求地址====>{}", StringUtils.arrayToDelimitedString(requestMapping.value(), ","));
+            log.info("请求返回:请求地址====>{}",  StringUtils.arrayToDelimitedString(requestMapping.value(), ","));
         }
         return body;
     }
