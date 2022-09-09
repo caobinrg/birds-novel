@@ -113,12 +113,12 @@ public class NovelConverOutDto implements IDtoParseUrl {
             this.image = image;
         }
     }
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-        if(ImagePathCheckUtil.check(imagePath)){
-            this.image = imagePath;
-        }
-    }
+//    public void setImagePath(String imagePath) {
+//        this.imagePath = imagePath;
+//        if(ImagePathCheckUtil.check(imagePath)){
+//            this.image = imagePath;
+//        }
+//    }
 
     @Override
     public void parseUrl() {

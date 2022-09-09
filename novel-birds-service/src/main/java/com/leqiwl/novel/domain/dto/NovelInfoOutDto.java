@@ -103,12 +103,12 @@ public class NovelInfoOutDto implements IDtoParseUrl {
             this.image = image;
         }
     }
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-        if(ImagePathCheckUtil.check(imagePath)){
-          this.image = imagePath;
-        }
-    }
+//    public void setImagePath(String imagePath) {
+//        this.imagePath = imagePath;
+//        if(ImagePathCheckUtil.check(imagePath)){
+//          this.image = imagePath;
+//        }
+//    }
 
     public void setChapterList(List<Chapter> chapterList) {
         if(CollectionUtil.isNotEmpty(chapterList)){
