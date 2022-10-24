@@ -28,9 +28,9 @@ public class IndexController {
         requestDispatcher.forward(request,response);
     }
 
-    @RequestMapping({"*"})
-    public void redirect(HttpServletResponse response) throws IOException {
-        response.sendRedirect(home);
-    }
+//    @RequestMapping({"*"})
+//    public void redirect(HttpServletResponse response) throws IOException {
+//        response.sendRedirect(home);
+//    }
 
 }
